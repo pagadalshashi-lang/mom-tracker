@@ -1,32 +1,43 @@
 import mongoose from "mongoose";
 
-const TaskSchema = new mongoose.Schema({
+const TaskSchema = new mongoose.Schema(
 
-  pointer: String,
+  {
 
-  subPointer: String,
+    account: String,
 
-  assignedTo: String,
+    mainPoint: String,
 
-  accountName: String,
+    subPoint: String,
 
-  status: String,
+    fpr: String,
 
-  plannedStartDate: String,
+    spr: String,
 
-  plannedEndDate: String,
+    plannedStartDate: String,
 
-  actualStartDate: String,
+    plannedEndDate: String,
 
-  actualEndDate: String,
+    actualStartDate: String,
 
-  createdBy: String,
+    actualEndDate: String,
 
-}, {
+    status: String,
 
-  timestamps: true,
+    remark: String,
 
-});
+    createdBy: String,
+
+  },
+
+  {
+
+    timestamps: true,
+
+  }
+
+);
 
 export default mongoose.models.Task ||
+
   mongoose.model("Task", TaskSchema);
