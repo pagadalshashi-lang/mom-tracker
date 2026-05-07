@@ -1,61 +1,86 @@
 import { NextResponse } from "next/server";
-import mongoose from "mongoose";
+
+import bcrypt from "bcryptjs";
+
+import dbConnect from "@/lib/dbConnect";
+
 import User from "@/models/User";
-
-const MONGODB_URI = process.env.MONGODB_URI;
-
-async function connectDB() {
-
-  if (mongoose.connections[0].readyState) {
-    return;
-  }
-
-  await mongoose.connect(MONGODB_URI);
-
-}
 
 export async function POST(req) {
 
   try {
 
-    await connectDB();
+    await dbConnect();
 
     const body = await req.json();
 
-    const { name, email, password } = body;
+    const {
+
+      fullName,
+
+      email,
+
+      password,
+
+      role,
+
+    } = body;
+
+    // Check existing user
 
     const existingUser = await User.findOne({ email });
 
     if (existingUser) {
 
       return NextResponse.json(
-        { message: "User already exists" },
-        { status: 400 }
+        {
+          message: "Email already exists",
+        },
+        {
+          status: 400,
+        }
       );
 
     }
 
+    // Hash Password
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Create User
+
     const newUser = await User.create({
-      name,
+
+      fullName,
+
       email,
-      password,
+
+      password: hashedPassword,
+
+      role,
+
     });
 
-    return NextResponse.json(
-      {
-        message: "User Created",
-        user: newUser,
-      },
-      { status: 201 }
-    );
+    return NextResponse.json({
+
+      message: "Account Created",
+
+      user: newUser,
+
+    });
 
   } catch (error) {
 
     console.log(error);
 
     return NextResponse.json(
-      { message: "Registration Failed" },
-      { status: 500 }
+      {
+        message: "Registration Failed",
+        error: error.message,
+      },
+      {
+        status: 500,
+      }
     );
 
   }
