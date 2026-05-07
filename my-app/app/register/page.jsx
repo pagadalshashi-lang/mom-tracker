@@ -17,7 +17,7 @@ export default function RegisterPage() {
 
   const [password, setPassword] = useState("");
 
-  // Fetch Employee List
+  // Fetch Employees
 
   useEffect(() => {
 
@@ -43,7 +43,7 @@ export default function RegisterPage() {
 
   }, []);
 
-  // Register
+  // Register Function
 
   const handleRegister = async () => {
 
@@ -129,31 +129,55 @@ export default function RegisterPage() {
 
           <div className="space-y-6">
 
-            {/* Employee Name Dropdown */}
+            {/* Employee Search */}
 
-            <select
-              value={fullName}
-              onChange={(e) => setFullName(e.target.value)}
-              className="w-full border p-5 rounded-2xl"
-            >
+            <div className="relative">
 
-              <option value="">
-                Select Employee Name
-              </option>
+              <input
+                type="text"
+                placeholder="Search Employee Name"
+                value={fullName}
+                onChange={(e) => setFullName(e.target.value)}
+                className="w-full border p-5 rounded-2xl"
+              />
 
               {
-                employees.map((emp, index) => (
 
-                  <option key={index} value={emp.EmployeeName}>
+                fullName.length > 0 && (
 
-                    {emp.EmployeeName}
+                  <div className="absolute w-full bg-white border rounded-2xl mt-2 max-h-60 overflow-y-auto shadow-xl z-50">
 
-                  </option>
+                    {
 
-                ))
+                      employees
+                        .filter((emp) =>
+                          emp.EmployeeName
+                            .toLowerCase()
+                            .includes(fullName.toLowerCase())
+                        )
+                        .map((emp, index) => (
+
+                          <div
+                            key={index}
+                            onClick={() => setFullName(emp.EmployeeName)}
+                            className="p-4 hover:bg-gray-100 cursor-pointer"
+                          >
+
+                            {emp.EmployeeName}
+
+                          </div>
+
+                        ))
+
+                    }
+
+                  </div>
+
+                )
+
               }
 
-            </select>
+            </div>
 
             {/* Email */}
 
