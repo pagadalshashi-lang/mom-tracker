@@ -75,6 +75,8 @@ export default function RegisterPage() {
 
       const data = await res.json();
 
+      console.log(data);
+
       if (res.ok) {
 
         alert("Account Created Successfully");
@@ -83,7 +85,7 @@ export default function RegisterPage() {
 
       } else {
 
-        alert(data.message || "Registration Failed");
+        alert(JSON.stringify(data));
 
       }
 
@@ -91,7 +93,7 @@ export default function RegisterPage() {
 
       console.log(error);
 
-      alert("Registration Failed");
+      alert(error.message);
 
     }
 
