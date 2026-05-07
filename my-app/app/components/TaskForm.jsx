@@ -54,16 +54,10 @@ export default function TaskForm() {
 
           setEmployees(data);
 
-          // ACCOUNT LIST FROM API
-
           const uniqueAccounts = [
-
             ...new Set(
-
               data.map((emp) => emp.account)
-
             ),
-
           ];
 
           setAccounts(uniqueAccounts);
@@ -191,9 +185,9 @@ export default function TaskForm() {
 
           actualEndDate: "",
 
-          status,
+          status: "Pending",
 
-          remark,
+          remark: "",
 
           createdBy: loggedUser?.fullName,
 
@@ -221,6 +215,8 @@ export default function TaskForm() {
 
         setPlannedEndDate("");
 
+        setStatus("Pending");
+
         setRemark("");
 
       } else {
@@ -241,7 +237,7 @@ export default function TaskForm() {
 
   return (
 
-    <div className="bg-white p-8 rounded-2xl shadow-lg">
+    <div className="bg-white p-8 rounded-3xl shadow-xl">
 
       {/* TOP */}
 
@@ -253,7 +249,7 @@ export default function TaskForm() {
 
         </h1>
 
-        {/* IMPORT EXCEL */}
+        {/* IMPORT BUTTON */}
 
         <label className="bg-green-600 hover:bg-green-700 text-white px-6 py-4 rounded-2xl cursor-pointer font-semibold shadow-lg transition">
 
@@ -269,6 +265,8 @@ export default function TaskForm() {
 
       </div>
 
+      {/* FORM */}
+
       <div className="grid grid-cols-2 gap-8">
 
         {/* ACCOUNT */}
@@ -277,7 +275,7 @@ export default function TaskForm() {
 
           <input
             type="text"
-            placeholder="Project / Client Name"
+            placeholder="Account / Project Name *"
             value={account}
             onChange={(e) => {
 
@@ -287,7 +285,6 @@ export default function TaskForm() {
 
             }}
             className="border border-gray-300 p-5 rounded-2xl w-full"
-            required
           />
 
           {
@@ -335,22 +332,20 @@ export default function TaskForm() {
 
         <input
           type="text"
-          placeholder="Main Point"
+          placeholder="Main Point *"
           value={mainPoint}
           onChange={(e) => setMainPoint(e.target.value)}
           className="border border-gray-300 p-5 rounded-2xl"
-          required
         />
 
         {/* SUB POINT */}
 
         <input
           type="text"
-          placeholder="Sub Point"
+          placeholder="Sub Point *"
           value={subPoint}
           onChange={(e) => setSubPoint(e.target.value)}
           className="border border-gray-300 p-5 rounded-2xl"
-          required
         />
 
         {/* FPR */}
@@ -359,7 +354,7 @@ export default function TaskForm() {
 
           <input
             type="text"
-            placeholder="FPR"
+            placeholder="FPR *"
             value={fpr}
             onChange={(e) => {
 
@@ -369,7 +364,6 @@ export default function TaskForm() {
 
             }}
             className="border border-gray-300 p-5 rounded-2xl w-full"
-            required
           />
 
           {
@@ -381,25 +375,27 @@ export default function TaskForm() {
 
                 {
 
-                  filteredFPR.slice(0, 10).map((emp, index) => (
+                  filteredFPR
+                    .slice(0, 10)
+                    .map((emp, index) => (
 
-                    <div
-                      key={index}
-                      className="p-4 hover:bg-blue-100 cursor-pointer border-b"
-                      onClick={() => {
+                      <div
+                        key={index}
+                        className="p-4 hover:bg-blue-100 cursor-pointer border-b"
+                        onClick={() => {
 
-                        setFpr(emp.name);
+                          setFpr(emp.name);
 
-                        setShowFprDropdown(false);
+                          setShowFprDropdown(false);
 
-                      }}
-                    >
+                        }}
+                      >
 
-                      {emp.name}
+                        {emp.name}
 
-                    </div>
+                      </div>
 
-                  ))
+                    ))
 
                 }
 
@@ -417,7 +413,7 @@ export default function TaskForm() {
 
           <input
             type="text"
-            placeholder="SPR"
+            placeholder="SPR *"
             value={spr}
             onChange={(e) => {
 
@@ -427,7 +423,6 @@ export default function TaskForm() {
 
             }}
             className="border border-gray-300 p-5 rounded-2xl w-full"
-            required
           />
 
           {
@@ -439,25 +434,27 @@ export default function TaskForm() {
 
                 {
 
-                  filteredSPR.slice(0, 10).map((emp, index) => (
+                  filteredSPR
+                    .slice(0, 10)
+                    .map((emp, index) => (
 
-                    <div
-                      key={index}
-                      className="p-4 hover:bg-blue-100 cursor-pointer border-b"
-                      onClick={() => {
+                      <div
+                        key={index}
+                        className="p-4 hover:bg-blue-100 cursor-pointer border-b"
+                        onClick={() => {
 
-                        setSpr(emp.name);
+                          setSpr(emp.name);
 
-                        setShowSprDropdown(false);
+                          setShowSprDropdown(false);
 
-                      }}
-                    >
+                        }}
+                      >
 
-                      {emp.name}
+                        {emp.name}
 
-                    </div>
+                      </div>
 
-                  ))
+                    ))
 
                 }
 
@@ -469,7 +466,7 @@ export default function TaskForm() {
 
         </div>
 
-        {/* START DATE */}
+        {/* PLAN START */}
 
         <input
           type="date"
@@ -478,10 +475,9 @@ export default function TaskForm() {
             setPlannedStartDate(e.target.value)
           }
           className="border border-gray-300 p-5 rounded-2xl"
-          required
         />
 
-        {/* END DATE */}
+        {/* PLAN END */}
 
         <input
           type="date"
@@ -489,30 +485,6 @@ export default function TaskForm() {
           onChange={(e) =>
             setPlannedEndDate(e.target.value)
           }
-          className="border border-gray-300 p-5 rounded-2xl"
-          required
-        />
-
-        {/* STATUS */}
-
-        <select
-          value={status}
-          onChange={(e) => setStatus(e.target.value)}
-          className="border border-gray-300 p-5 rounded-2xl"
-        >
-
-          <option>Pending</option>
-          <option>In Progress</option>
-          <option>Closed</option>
-
-        </select>
-
-        {/* REMARK */}
-
-        <textarea
-          placeholder="Remark"
-          value={remark}
-          onChange={(e) => setRemark(e.target.value)}
           className="border border-gray-300 p-5 rounded-2xl"
         />
 
