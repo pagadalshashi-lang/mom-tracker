@@ -11,6 +11,8 @@ export default function RegisterPage() {
 
   const [fullName, setFullName] = useState("");
 
+  const [showSuggestions, setShowSuggestions] = useState(false);
+
   const [role, setRole] = useState("Employee");
 
   const [email, setEmail] = useState("");
@@ -28,8 +30,6 @@ export default function RegisterPage() {
         const res = await fetch("/api/employees");
 
         const data = await res.json();
-
-        console.log(data);
 
         setEmployees(data);
 
@@ -139,13 +139,19 @@ export default function RegisterPage() {
                 type="text"
                 placeholder="Search Employee Name"
                 value={fullName}
-                onChange={(e) => setFullName(e.target.value)}
+                onChange={(e) => {
+
+                  setFullName(e.target.value);
+
+                  setShowSuggestions(true);
+
+                }}
                 className="w-full border p-5 rounded-2xl"
               />
 
               {
 
-                fullName.length > 0 && (
+                showSuggestions && fullName.length > 0 && (
 
                   <div className="absolute w-full bg-white border rounded-2xl mt-2 max-h-60 overflow-y-auto shadow-xl z-50">
 
@@ -157,11 +163,18 @@ export default function RegisterPage() {
                             ?.toLowerCase()
                             .includes(fullName.toLowerCase())
                         )
+                        .slice(0, 5)
                         .map((emp, index) => (
 
                           <div
                             key={index}
-                            onClick={() => setFullName(emp.name)}
+                            onClick={() => {
+
+                              setFullName(emp.name);
+
+                              setShowSuggestions(false);
+
+                            }}
                             className="p-4 hover:bg-gray-100 cursor-pointer border-b"
                           >
 
