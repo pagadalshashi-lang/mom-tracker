@@ -145,14 +145,14 @@ export default function RegisterPage() {
 
                 fullName.length > 0 && (
 
-                  <div className="absolute w-full bg-white border rounded-2xl mt-2 max-h-60 overflow-y-auto shadow-xl z-50">
+                  <div className="absolute w-full bg-white border rounded-2xl mt-2 max-h-60 overflow-y-auto shadow-xl z-50 bg-white">
 
                     {
 
                       employees
                         .filter((emp) =>
                           emp.EmployeeName
-                            .toLowerCase()
+                            ?.toLowerCase()
                             .includes(fullName.toLowerCase())
                         )
                         .map((emp, index) => (
@@ -160,7 +160,7 @@ export default function RegisterPage() {
                           <div
                             key={index}
                             onClick={() => setFullName(emp.EmployeeName)}
-                            className="p-4 hover:bg-gray-100 cursor-pointer"
+                            className="p-4 hover:bg-gray-100 cursor-pointer border-b"
                           >
 
                             {emp.EmployeeName}
@@ -217,7 +217,7 @@ export default function RegisterPage() {
 
             </select>
 
-            {/* Button */}
+            {/* Create Button */}
 
             <button
               onClick={handleRegister}
