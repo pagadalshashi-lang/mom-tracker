@@ -1,13 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
 export default function RegisterPage() {
 
   const router = useRouter();
 
-  const [name, setName] = useState("");
+  const [employees, setEmployees] = useState([]);
 
   const [fullName, setFullName] = useState("");
 
@@ -16,6 +16,34 @@ export default function RegisterPage() {
   const [email, setEmail] = useState("");
 
   const [password, setPassword] = useState("");
+
+  // Fetch Employee List
+
+  useEffect(() => {
+
+    const fetchEmployees = async () => {
+
+      try {
+
+        const res = await fetch("/api/employees");
+
+        const data = await res.json();
+
+        setEmployees(data);
+
+      } catch (error) {
+
+        console.log(error);
+
+      }
+
+    };
+
+    fetchEmployees();
+
+  }, []);
+
+  // Register
 
   const handleRegister = async () => {
 
@@ -30,8 +58,6 @@ export default function RegisterPage() {
         },
 
         body: JSON.stringify({
-
-          name,
 
           fullName,
 
@@ -55,7 +81,7 @@ export default function RegisterPage() {
 
       } else {
 
-        alert(data.message);
+        alert(data.message || "Registration Failed");
 
       }
 
@@ -103,25 +129,31 @@ export default function RegisterPage() {
 
           <div className="space-y-6">
 
-            {/* Short Name */}
+            {/* Employee Name Dropdown */}
 
-            <input
-              type="text"
-              placeholder="Short Name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              className="w-full border p-5 rounded-2xl"
-            />
-
-            {/* HRMS Full Name */}
-
-            <input
-              type="text"
-              placeholder="Employee Full Name"
+            <select
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
               className="w-full border p-5 rounded-2xl"
-            />
+            >
+
+              <option value="">
+                Select Employee Name
+              </option>
+
+              {
+                employees.map((emp, index) => (
+
+                  <option key={index} value={emp.EmployeeName}>
+
+                    {emp.EmployeeName}
+
+                  </option>
+
+                ))
+              }
+
+            </select>
 
             {/* Email */}
 
