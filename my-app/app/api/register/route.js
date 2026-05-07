@@ -71,17 +71,16 @@ export async function POST(req) {
 
   } catch (error) {
 
-    console.log(error);
+  console.log(error);
 
-    return NextResponse.json(
-      {
-        message: "Registration Failed",
-        error: error.message,
-      },
-      {
-        status: 500,
-      }
-    );
+  return NextResponse.json(
+    {
+      message: error.message,
+    },
+    {
+      status: 500,
+    }
+  );
 
   }
 
