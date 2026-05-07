@@ -29,6 +29,8 @@ export default function RegisterPage() {
 
         const data = await res.json();
 
+        console.log(data);
+
         setEmployees(data);
 
       } catch (error) {
@@ -145,13 +147,13 @@ export default function RegisterPage() {
 
                 fullName.length > 0 && (
 
-                  <div className="absolute w-full bg-white border rounded-2xl mt-2 max-h-60 overflow-y-auto shadow-xl z-50 bg-white">
+                  <div className="absolute w-full bg-white border rounded-2xl mt-2 max-h-60 overflow-y-auto shadow-xl z-50">
 
                     {
 
                       employees
                         .filter((emp) =>
-                          emp.EmployeeName
+                          emp.fullName
                             ?.toLowerCase()
                             .includes(fullName.toLowerCase())
                         )
@@ -159,11 +161,11 @@ export default function RegisterPage() {
 
                           <div
                             key={index}
-                            onClick={() => setFullName(emp.EmployeeName)}
+                            onClick={() => setFullName(emp.fullName)}
                             className="p-4 hover:bg-gray-100 cursor-pointer border-b"
                           >
 
-                            {emp.EmployeeName}
+                            {emp.fullName}
 
                           </div>
 
@@ -217,7 +219,7 @@ export default function RegisterPage() {
 
             </select>
 
-            {/* Create Button */}
+            {/* Button */}
 
             <button
               onClick={handleRegister}
