@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import Image from "next/image";
 
 export default function Sidebar() {
 
@@ -21,37 +22,67 @@ export default function Sidebar() {
 
   return (
 
-    <div className="w-[280px] bg-blue-900 text-white min-h-screen p-8">
+    <div className="w-[320px] bg-blue-900 text-white min-h-screen p-8">
 
-      {/* Logo */}
+      {/* Logo + Title */}
 
-      <h1 className="text-5xl font-bold mb-14 leading-tight">
-        Mom <br /> Tracker
-      </h1>
+      <div className="flex flex-col items-center mb-14">
+
+        {/* Logo */}
+
+        <div className="bg-white p-4 rounded-3xl shadow-2xl mb-6">
+
+          <Image
+            src="/logo.jpg"
+            alt="Logo"
+            width={120}
+            height={120}
+            className="object-contain"
+          />
+
+        </div>
+
+        {/* Title */}
+
+        <h1 className="text-6xl font-extrabold tracking-wide text-center leading-tight">
+
+          MOM
+          <br />
+          Tracker
+
+        </h1>
+
+        <p className="text-blue-200 text-center mt-4 text-lg">
+
+          Task Management System
+
+        </p>
+
+      </div>
 
       {/* Menu */}
 
-      <div className="flex flex-col gap-7">
+      <div className="flex flex-col gap-6">
 
         {/* Dashboard */}
 
         <Link
           href="/dashboard"
-          className="bg-blue-800 hover:bg-blue-700 px-7 py-5 rounded-3xl text-2xl font-medium transition duration-300"
+          className="bg-blue-800 hover:bg-blue-700 px-6 py-5 rounded-3xl text-2xl text-center transition font-semibold"
         >
 
           Dashboard
 
         </Link>
 
-        {/* Add Task */}
+        {/* Employee Only */}
 
         {
           user?.role === "Employee" && (
 
             <Link
               href="/dashboard/add-task"
-              className="bg-blue-800 hover:bg-blue-700 px-7 py-5 rounded-3xl text-2xl font-medium transition duration-300"
+              className="bg-blue-800 hover:bg-blue-700 px-6 py-5 rounded-3xl text-2xl text-center transition font-semibold"
             >
 
               Add Task
@@ -65,7 +96,7 @@ export default function Sidebar() {
 
         <Link
           href="/reports"
-          className="bg-blue-800 hover:bg-blue-700 px-7 py-5 rounded-3xl text-2xl font-medium transition duration-300"
+          className="bg-blue-800 hover:bg-blue-700 px-6 py-5 rounded-3xl text-2xl text-center transition font-semibold"
         >
 
           Reports

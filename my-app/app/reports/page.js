@@ -5,11 +5,11 @@ import { useEffect, useState } from "react";
 
 export default function ReportsPage() {
 
-  const [tasks, setTasks] = useState([]);
-
+  const [assignedTasks, setAssignedTasks] = useState([]);
+  const [selfTasks, setSelfTasks] = useState([]);
   const [user, setUser] = useState(null);
 
-  // Logged User
+  // LOGGED USER
 
   useEffect(() => {
 
@@ -23,7 +23,7 @@ export default function ReportsPage() {
 
   }, []);
 
-  // Fetch Tasks
+  // FETCH TASKS
 
   const fetchTasks = async () => {
 
@@ -33,7 +33,40 @@ export default function ReportsPage() {
 
       const data = await res.json();
 
-      setTasks(data);
+      const loggedUser = JSON.parse(
+        localStorage.getItem("user")
+      );
+
+      // ASSIGNED BY ME
+
+      const creatorTasks = data.filter(
+
+        (task) =>
+
+          task.createdBy?.toLowerCase() ===
+          loggedUser?.fullName?.toLowerCase()
+
+      );
+
+      // ASSIGNED TO ME
+
+      const myTasks = data.filter(
+
+        (task) =>
+
+          task.fpr?.toLowerCase() ===
+            loggedUser?.fullName?.toLowerCase()
+
+          ||
+
+          task.spr?.toLowerCase() ===
+            loggedUser?.fullName?.toLowerCase()
+
+      );
+
+      setAssignedTasks(creatorTasks);
+
+      setSelfTasks(myTasks);
 
     } catch (error) {
 
@@ -49,45 +82,38 @@ export default function ReportsPage() {
 
   }, []);
 
-  // Update Status
+  // UPDATE TASK
 
-  const updateTaskStatus = async (taskId, newStatus) => {
+  const updateTask = async (
+    taskId,
+    updatedFields
+  ) => {
 
     try {
 
-      const actualStartDate =
-        newStatus === "In Process"
-          ? new Date().toISOString().split("T")[0]
-          : "";
+      const res = await fetch(
 
-      const actualEndDate =
-        newStatus === "Closed"
-          ? new Date().toISOString().split("T")[0]
-          : "";
+        `/api/tasks/${taskId}`,
 
-      const res = await fetch(`/api/tasks/${taskId}`, {
+        {
 
-        method: "PUT",
+          method: "PUT",
 
-        headers: {
-          "Content-Type": "application/json",
-        },
+          headers: {
+            "Content-Type": "application/json",
+          },
 
-        body: JSON.stringify({
+          body: JSON.stringify(updatedFields),
 
-          status: newStatus,
+        }
 
-          actualStartDate,
-
-          actualEndDate,
-
-        }),
-
-      });
+      );
 
       const data = await res.json();
 
       if (data.success) {
+
+        alert("Task Updated");
 
         fetchTasks();
 
@@ -105,54 +131,72 @@ export default function ReportsPage() {
 
     <div className="flex min-h-screen bg-gray-100">
 
-      {/* Sidebar */}
+      {/* SIDEBAR */}
 
       <Sidebar />
 
-      {/* Main */}
+      {/* MAIN */}
 
-      <div className="flex-1 p-10">
+      <div className="flex-1 p-8 overflow-auto">
 
-        <h1 className="text-5xl font-bold text-gray-800 mb-10">
-          Reports
+        {/* ASSIGNED TASKS */}
+
+        <h1 className="text-3xl font-bold text-gray-800 mb-5">
+
+          Assigned Tasks
+
         </h1>
 
-        {/* Table */}
+        <div className="bg-white rounded-3xl shadow-lg overflow-auto mb-14">
 
-        <div className="bg-white rounded-3xl shadow-lg overflow-auto">
+          <table className="w-full text-sm">
 
-          <table className="w-full">
-
-            <thead className="bg-blue-600 text-white">
+            <thead className="bg-blue-700 text-white">
 
               <tr>
 
-                <th className="p-5 text-left">
-                  Pointer
+                <th className="p-3 text-left">
+                  Account
                 </th>
 
-                <th className="p-5 text-left">
-                  Assigned To
+                <th className="p-3 text-left">
+                  Main Point
                 </th>
 
-                <th className="p-5 text-left">
-                  Status
+                <th className="p-3 text-left">
+                  Sub Point
                 </th>
 
-                <th className="p-5 text-left">
-                  Planned End
+                <th className="p-3 text-left">
+                  FPR
                 </th>
 
-                <th className="p-5 text-left">
+                <th className="p-3 text-left">
+                  SPR
+                </th>
+
+                <th className="p-3 text-left">
+                  Plan Start
+                </th>
+
+                <th className="p-3 text-left">
                   Actual Start
                 </th>
 
-                <th className="p-5 text-left">
+                <th className="p-3 text-left">
+                  Plan End
+                </th>
+
+                <th className="p-3 text-left">
                   Actual End
                 </th>
 
-                <th className="p-5 text-left">
-                  Action
+                <th className="p-3 text-left">
+                  Status
+                </th>
+
+                <th className="p-3 text-left">
+                  Remark
                 </th>
 
               </tr>
@@ -162,108 +206,326 @@ export default function ReportsPage() {
             <tbody>
 
               {
-                tasks.map((task, index) => (
+
+                assignedTasks.map((task, index) => (
 
                   <tr
                     key={index}
                     className="border-b hover:bg-gray-50"
                   >
 
-                    {/* Pointer */}
-
-                    <td className="p-5">
-                      {task.pointer}
+                    <td className="p-3">
+                      {task.account}
                     </td>
 
-                    {/* Assigned */}
-
-                    <td className="p-5">
-                      {task.assignedTo}
+                    <td className="p-3">
+                      {task.mainPoint}
                     </td>
 
-                    {/* Status */}
-
-                    <td className="p-5">
-
-                      <span
-                        className={`px-4 py-2 rounded-xl text-white text-sm
-
-                          ${
-                            task.status === "Assigned"
-                              ? "bg-blue-500"
-                              : task.status === "In Process"
-                              ? "bg-yellow-500"
-                              : "bg-green-600"
-                          }
-
-                        `}
-                      >
-
-                        {task.status}
-
-                      </span>
-
+                    <td className="p-3">
+                      {task.subPoint}
                     </td>
 
-                    {/* Planned End */}
-
-                    <td className="p-5">
-                      {task.plannedEndDate}
+                    <td className="p-3">
+                      {task.fpr}
                     </td>
 
-                    {/* Actual Start */}
+                    <td className="p-3">
+                      {task.spr}
+                    </td>
 
-                    <td className="p-5">
+                    <td className="p-3">
+                      {task.plannedStartDate}
+                    </td>
+
+                    <td className="p-3">
                       {task.actualStartDate || "-"}
                     </td>
 
-                    {/* Actual End */}
+                    <td className="p-3">
+                      {task.plannedEndDate}
+                    </td>
 
-                    <td className="p-5">
+                    <td className="p-3">
                       {task.actualEndDate || "-"}
                     </td>
 
-                    {/* Action */}
+                    <td className="p-3">
+                      {task.status}
+                    </td>
 
-                    <td className="p-5">
+                    <td className="p-3">
+                      {task.remark || "-"}
+                    </td>
 
-                      {
-                        user?.name?.toLowerCase() ===
-                        task.assignedTo?.toLowerCase() && (
+                  </tr>
 
-                          <select
-                            value={task.status}
-                            onChange={(e) =>
-                              updateTaskStatus(
-                                task._id,
-                                e.target.value
-                              )
+                ))
+
+              }
+
+            </tbody>
+
+          </table>
+
+        </div>
+
+        {/* SELF TASKS */}
+
+        <h1 className="text-3xl font-bold text-gray-800 mb-5">
+
+          Self Tasks
+
+        </h1>
+
+        <div className="bg-white rounded-3xl shadow-lg overflow-auto">
+
+          <table className="w-full text-sm">
+
+            <thead className="bg-green-700 text-white">
+
+              <tr>
+
+                <th className="p-3 text-left">
+                  Account
+                </th>
+
+                <th className="p-3 text-left">
+                  Main Point
+                </th>
+
+                <th className="p-3 text-left">
+                  Sub Point
+                </th>
+
+                <th className="p-3 text-left">
+                  FPR
+                </th>
+
+                <th className="p-3 text-left">
+                  SPR
+                </th>
+
+                <th className="p-3 text-left">
+                  Plan Start
+                </th>
+
+                <th className="p-3 text-left">
+                  Actual Start
+                </th>
+
+                <th className="p-3 text-left">
+                  Plan End
+                </th>
+
+                <th className="p-3 text-left">
+                  Actual End
+                </th>
+
+                <th className="p-3 text-left">
+                  Status
+                </th>
+
+                <th className="p-3 text-left">
+                  Remark
+                </th>
+
+                <th className="p-3 text-left">
+                  Save
+                </th>
+
+              </tr>
+
+            </thead>
+
+            <tbody>
+
+              {
+
+                selfTasks.map((task, index) => (
+
+                  <tr
+                    key={index}
+                    className="border-b hover:bg-gray-50"
+                  >
+
+                    <td className="p-3">
+                      {task.account}
+                    </td>
+
+                    <td className="p-3">
+                      {task.mainPoint}
+                    </td>
+
+                    <td className="p-3">
+                      {task.subPoint}
+                    </td>
+
+                    <td className="p-3">
+                      {task.fpr}
+                    </td>
+
+                    <td className="p-3">
+                      {task.spr}
+                    </td>
+
+                    <td className="p-3">
+                      {task.plannedStartDate}
+                    </td>
+
+                    {/* ACTUAL START */}
+
+                    <td className="p-3">
+
+                      <input
+                        type="date"
+                        value={
+                          task.actualStartDate || ""
+                        }
+                        onChange={(e) => {
+
+                          const updatedTasks = [...selfTasks];
+
+                          updatedTasks[index]
+                            .actualStartDate =
+                              e.target.value;
+
+                          setSelfTasks(updatedTasks);
+
+                        }}
+                        className="border p-2 rounded-lg text-sm"
+                      />
+
+                    </td>
+
+                    <td className="p-3">
+                      {task.plannedEndDate}
+                    </td>
+
+                    {/* ACTUAL END */}
+
+                    <td className="p-3">
+
+                      <input
+                        type="date"
+                        value={
+                          task.actualEndDate || ""
+                        }
+                        onChange={(e) => {
+
+                          const updatedTasks = [...selfTasks];
+
+                          updatedTasks[index]
+                            .actualEndDate =
+                              e.target.value;
+
+                          setSelfTasks(updatedTasks);
+
+                        }}
+                        className="border p-2 rounded-lg text-sm"
+                      />
+
+                    </td>
+
+                    {/* STATUS */}
+
+                    <td className="p-3">
+
+                      <select
+                        value={task.status}
+                        onChange={(e) => {
+
+                          const updatedTasks = [...selfTasks];
+
+                          updatedTasks[index].status =
+                            e.target.value;
+
+                          setSelfTasks(updatedTasks);
+
+                        }}
+                        className="border p-2 rounded-lg text-sm"
+                      >
+
+                        <option value="Pending">
+                          Pending
+                        </option>
+
+                        <option value="In Progress">
+                          In Progress
+                        </option>
+
+                        <option value="Closed">
+                          Closed
+                        </option>
+
+                      </select>
+
+                    </td>
+
+                    {/* REMARK */}
+
+                    <td className="p-3">
+
+                      <input
+                        type="text"
+                        value={task.remark || ""}
+                        onChange={(e) => {
+
+                          const updatedTasks = [...selfTasks];
+
+                          updatedTasks[index].remark =
+                            e.target.value;
+
+                          setSelfTasks(updatedTasks);
+
+                        }}
+                        className="border p-2 rounded-lg text-sm"
+                        placeholder="Remark"
+                      />
+
+                    </td>
+
+                    {/* SAVE */}
+
+                    <td className="p-3">
+
+                      <button
+                        onClick={() =>
+                          updateTask(
+
+                            task._id,
+
+                            {
+
+                              status:
+                                task.status,
+
+                              actualStartDate:
+                                task.actualStartDate,
+
+                              actualEndDate:
+                                task.actualEndDate,
+
+                              remark:
+                                task.remark,
+
                             }
-                            className="border p-3 rounded-xl"
-                          >
 
-                            <option value="Assigned">
-                              Assigned
-                            </option>
+                          )
+                        }
+                        className="bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded-lg text-sm"
+                      >
 
-                            <option value="In Process">
-                              In Process
-                            </option>
+                        Save
 
-                            <option value="Closed">
-                              Closed
-                            </option>
-
-                          </select>
-
-                        )
-                      }
+                      </button>
 
                     </td>
 
                   </tr>
 
                 ))
+
               }
 
             </tbody>

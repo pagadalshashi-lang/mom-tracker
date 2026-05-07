@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 export default function RegisterPage() {
 
@@ -73,8 +74,6 @@ export default function RegisterPage() {
 
       });
 
-      // SAFE RESPONSE
-
       const text = await res.text();
 
       console.log(text);
@@ -119,15 +118,37 @@ export default function RegisterPage() {
 
     <div className="min-h-screen flex">
 
-      {/* Left Side */}
+      {/* LEFT SIDE */}
 
       <div className="w-1/2 bg-blue-900 text-white flex flex-col justify-center items-center p-10">
 
-        <h1 className="text-6xl font-bold mb-6">
-          Mom Tracker
+        {/* Logo */}
+
+        <div className="bg-white p-5 rounded-3xl shadow-2xl mb-8">
+
+          <Image
+            src="/logo.jpg"
+            alt="Logo"
+            width={140}
+            height={140}
+            className="object-contain"
+          />
+
+        </div>
+
+        {/* Heading */}
+
+        <h1 className="text-7xl font-extrabold text-center leading-tight">
+
+          MOM
+          <br />
+          Tracker
+
         </h1>
 
-        <p className="text-2xl text-center text-gray-300 leading-10">
+        {/* Subtitle */}
+
+        <p className="text-2xl text-center text-blue-200 leading-10 mt-8 max-w-[600px]">
 
           Manage Tasks, Employees, Reports and Workflow in one smart place.
 
@@ -135,7 +156,7 @@ export default function RegisterPage() {
 
       </div>
 
-      {/* Right Side */}
+      {/* RIGHT SIDE */}
 
       <div className="w-1/2 flex justify-center items-center bg-gray-100">
 

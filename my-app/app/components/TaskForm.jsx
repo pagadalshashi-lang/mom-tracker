@@ -5,19 +5,40 @@ import { useEffect, useState } from "react";
 export default function TaskForm() {
 
   const [employees, setEmployees] = useState([]);
-  const [filteredEmployees, setFilteredEmployees] = useState([]);
 
-  const [searchEmployee, setSearchEmployee] = useState("");
-  const [accountName, setAccountName] = useState("");
-  const [pointer, setPointer] = useState("");
-  const [subPointer, setSubPointer] = useState("");
+  const [accounts, setAccounts] = useState([]);
+
+  const [filteredAccounts, setFilteredAccounts] = useState([]);
+
+  const [filteredFPR, setFilteredFPR] = useState([]);
+
+  const [filteredSPR, setFilteredSPR] = useState([]);
+
+  const [account, setAccount] = useState("");
+
+  const [mainPoint, setMainPoint] = useState("");
+
+  const [subPoint, setSubPoint] = useState("");
+
+  const [fpr, setFpr] = useState("");
+
+  const [spr, setSpr] = useState("");
+
   const [plannedStartDate, setPlannedStartDate] = useState("");
+
   const [plannedEndDate, setPlannedEndDate] = useState("");
-  const [status, setStatus] = useState("Assigned");
 
-  const [showDropdown, setShowDropdown] = useState(false);
+  const [status, setStatus] = useState("Pending");
 
-  // Fetch Employees
+  const [remark, setRemark] = useState("");
+
+  const [showAccountDropdown, setShowAccountDropdown] = useState(false);
+
+  const [showFprDropdown, setShowFprDropdown] = useState(false);
+
+  const [showSprDropdown, setShowSprDropdown] = useState(false);
+
+  // FETCH EMPLOYEES
 
   useEffect(() => {
 
@@ -33,6 +54,20 @@ export default function TaskForm() {
 
           setEmployees(data);
 
+          // ACCOUNT LIST FROM API
+
+          const uniqueAccounts = [
+
+            ...new Set(
+
+              data.map((emp) => emp.account)
+
+            ),
+
+          ];
+
+          setAccounts(uniqueAccounts);
+
         }
 
       } catch (error) {
@@ -47,13 +82,36 @@ export default function TaskForm() {
 
   }, []);
 
-  // Search Employee
+  // ACCOUNT FILTER
 
   useEffect(() => {
 
-    if (searchEmployee.trim() === "") {
+    if (account.trim() === "") {
 
-      setFilteredEmployees([]);
+      setFilteredAccounts([]);
+
+      return;
+
+    }
+
+    const filtered = accounts.filter((acc) =>
+
+      acc?.toLowerCase()
+        .includes(account.toLowerCase())
+
+    );
+
+    setFilteredAccounts(filtered);
+
+  }, [account, accounts]);
+
+  // FPR FILTER
+
+  useEffect(() => {
+
+    if (fpr.trim() === "") {
+
+      setFilteredFPR([]);
 
       return;
 
@@ -63,25 +121,37 @@ export default function TaskForm() {
 
       emp.name
         ?.toLowerCase()
-        .includes(searchEmployee.toLowerCase())
+        .includes(fpr.toLowerCase())
 
     );
 
-    setFilteredEmployees(filtered);
+    setFilteredFPR(filtered);
 
-  }, [searchEmployee, employees]);
+  }, [fpr, employees]);
 
-  // Select Employee
+  // SPR FILTER
 
-  const handleSelectEmployee = (emp) => {
+  useEffect(() => {
 
-    setSearchEmployee(emp.name);
+    if (spr.trim() === "") {
 
-    setAccountName(emp.account || "");
+      setFilteredSPR([]);
 
-    setShowDropdown(false);
+      return;
 
-  };
+    }
+
+    const filtered = employees.filter((emp) =>
+
+      emp.name
+        ?.toLowerCase()
+        .includes(spr.toLowerCase())
+
+    );
+
+    setFilteredSPR(filtered);
+
+  }, [spr, employees]);
 
   // CREATE TASK
 
@@ -103,15 +173,15 @@ export default function TaskForm() {
 
         body: JSON.stringify({
 
-          pointer,
+          account,
 
-          subPointer,
+          mainPoint,
 
-          assignedTo: searchEmployee,
+          subPoint,
 
-          accountName,
+          fpr,
 
-          status,
+          spr,
 
           plannedStartDate,
 
@@ -121,7 +191,11 @@ export default function TaskForm() {
 
           actualEndDate: "",
 
-          createdBy: loggedUser?.name,
+          status,
+
+          remark,
+
+          createdBy: loggedUser?.fullName,
 
         }),
 
@@ -129,18 +203,25 @@ export default function TaskForm() {
 
       const data = await res.json();
 
-      if (data.success) {
+      if (data.success || data._id) {
 
         alert("Task Created Successfully");
 
-        // Clear Form
+        setAccount("");
 
-        setPointer("");
-        setSubPointer("");
-        setSearchEmployee("");
-        setAccountName("");
+        setMainPoint("");
+
+        setSubPoint("");
+
+        setFpr("");
+
+        setSpr("");
+
         setPlannedStartDate("");
+
         setPlannedEndDate("");
+
+        setRemark("");
 
       } else {
 
@@ -162,138 +243,282 @@ export default function TaskForm() {
 
     <div className="bg-white p-8 rounded-2xl shadow-lg">
 
-      <h1 className="text-4xl font-bold mb-10 text-gray-800">
-        Create Task
-      </h1>
+      {/* TOP */}
+
+      <div className="flex justify-between items-center mb-10">
+
+        <h1 className="text-4xl font-bold text-gray-800">
+
+          Add Task
+
+        </h1>
+
+        {/* IMPORT EXCEL */}
+
+        <label className="bg-green-600 hover:bg-green-700 text-white px-6 py-4 rounded-2xl cursor-pointer font-semibold shadow-lg transition">
+
+          Import Excel
+
+          <input
+            type="file"
+            accept=".xlsx,.xls,.csv"
+            className="hidden"
+          />
+
+        </label>
+
+      </div>
 
       <div className="grid grid-cols-2 gap-8">
 
-        {/* Pointer */}
-
-        <input
-          type="text"
-          placeholder="Pointer"
-          value={pointer}
-          onChange={(e) => setPointer(e.target.value)}
-          className="border border-gray-300 p-5 rounded-2xl"
-        />
-
-        {/* Sub Pointer */}
-
-        <input
-          type="text"
-          placeholder="Sub Pointer"
-          value={subPointer}
-          onChange={(e) => setSubPointer(e.target.value)}
-          className="border border-gray-300 p-5 rounded-2xl"
-        />
-
-        {/* Employee */}
+        {/* ACCOUNT */}
 
         <div className="relative">
 
           <input
             type="text"
-            placeholder="Assign Employee"
-            value={searchEmployee}
+            placeholder="Project / Client Name"
+            value={account}
             onChange={(e) => {
 
-              setSearchEmployee(e.target.value);
+              setAccount(e.target.value);
 
-              setShowDropdown(true);
+              setShowAccountDropdown(true);
 
             }}
             className="border border-gray-300 p-5 rounded-2xl w-full"
+            required
           />
 
-          {/* Dropdown */}
-
           {
-            showDropdown &&
-            filteredEmployees.length > 0 && (
+
+            showAccountDropdown &&
+            filteredAccounts.length > 0 && (
 
               <div className="absolute w-full bg-white border rounded-2xl shadow-lg mt-2 z-50 max-h-[250px] overflow-y-auto">
 
                 {
-                  filteredEmployees.slice(0, 10).map((emp, index) => (
 
-                    <div
-                      key={index}
-                      className="p-4 hover:bg-blue-100 cursor-pointer border-b"
-                      onClick={() => handleSelectEmployee(emp)}
-                    >
+                  filteredAccounts
+                    .slice(0, 10)
+                    .map((acc, index) => (
 
-                      <div className="font-semibold text-lg">
-                        {emp.name}
+                      <div
+                        key={index}
+                        className="p-4 hover:bg-blue-100 cursor-pointer border-b"
+                        onClick={() => {
+
+                          setAccount(acc);
+
+                          setShowAccountDropdown(false);
+
+                        }}
+                      >
+
+                        {acc}
+
                       </div>
 
-                      <div className="text-sm text-gray-500">
-                        {emp.account}
-                      </div>
+                    ))
 
-                    </div>
-
-                  ))
                 }
 
               </div>
 
             )
+
           }
 
         </div>
 
-        {/* Account */}
+        {/* MAIN POINT */}
 
         <input
           type="text"
-          placeholder="Account Name"
-          value={accountName}
-          readOnly
-          className="border border-gray-300 p-5 rounded-2xl bg-gray-100"
+          placeholder="Main Point"
+          value={mainPoint}
+          onChange={(e) => setMainPoint(e.target.value)}
+          className="border border-gray-300 p-5 rounded-2xl"
+          required
         />
 
-        {/* Planned Start */}
+        {/* SUB POINT */}
 
-        <div>
+        <input
+          type="text"
+          placeholder="Sub Point"
+          value={subPoint}
+          onChange={(e) => setSubPoint(e.target.value)}
+          className="border border-gray-300 p-5 rounded-2xl"
+          required
+        />
 
-          <label className="block mb-2 font-semibold text-gray-700">
-            Planned Start Date
-          </label>
+        {/* FPR */}
+
+        <div className="relative">
 
           <input
-            type="date"
-            value={plannedStartDate}
-            onChange={(e) =>
-              setPlannedStartDate(e.target.value)
-            }
+            type="text"
+            placeholder="FPR"
+            value={fpr}
+            onChange={(e) => {
+
+              setFpr(e.target.value);
+
+              setShowFprDropdown(true);
+
+            }}
             className="border border-gray-300 p-5 rounded-2xl w-full"
+            required
           />
+
+          {
+
+            showFprDropdown &&
+            filteredFPR.length > 0 && (
+
+              <div className="absolute w-full bg-white border rounded-2xl shadow-lg mt-2 z-50 max-h-[250px] overflow-y-auto">
+
+                {
+
+                  filteredFPR.slice(0, 10).map((emp, index) => (
+
+                    <div
+                      key={index}
+                      className="p-4 hover:bg-blue-100 cursor-pointer border-b"
+                      onClick={() => {
+
+                        setFpr(emp.name);
+
+                        setShowFprDropdown(false);
+
+                      }}
+                    >
+
+                      {emp.name}
+
+                    </div>
+
+                  ))
+
+                }
+
+              </div>
+
+            )
+
+          }
 
         </div>
 
-        {/* Planned End */}
+        {/* SPR */}
 
-        <div>
-
-          <label className="block mb-2 font-semibold text-gray-700">
-            Planned End Date
-          </label>
+        <div className="relative">
 
           <input
-            type="date"
-            value={plannedEndDate}
-            onChange={(e) =>
-              setPlannedEndDate(e.target.value)
-            }
+            type="text"
+            placeholder="SPR"
+            value={spr}
+            onChange={(e) => {
+
+              setSpr(e.target.value);
+
+              setShowSprDropdown(true);
+
+            }}
             className="border border-gray-300 p-5 rounded-2xl w-full"
+            required
           />
 
+          {
+
+            showSprDropdown &&
+            filteredSPR.length > 0 && (
+
+              <div className="absolute w-full bg-white border rounded-2xl shadow-lg mt-2 z-50 max-h-[250px] overflow-y-auto">
+
+                {
+
+                  filteredSPR.slice(0, 10).map((emp, index) => (
+
+                    <div
+                      key={index}
+                      className="p-4 hover:bg-blue-100 cursor-pointer border-b"
+                      onClick={() => {
+
+                        setSpr(emp.name);
+
+                        setShowSprDropdown(false);
+
+                      }}
+                    >
+
+                      {emp.name}
+
+                    </div>
+
+                  ))
+
+                }
+
+              </div>
+
+            )
+
+          }
+
         </div>
+
+        {/* START DATE */}
+
+        <input
+          type="date"
+          value={plannedStartDate}
+          onChange={(e) =>
+            setPlannedStartDate(e.target.value)
+          }
+          className="border border-gray-300 p-5 rounded-2xl"
+          required
+        />
+
+        {/* END DATE */}
+
+        <input
+          type="date"
+          value={plannedEndDate}
+          onChange={(e) =>
+            setPlannedEndDate(e.target.value)
+          }
+          className="border border-gray-300 p-5 rounded-2xl"
+          required
+        />
+
+        {/* STATUS */}
+
+        <select
+          value={status}
+          onChange={(e) => setStatus(e.target.value)}
+          className="border border-gray-300 p-5 rounded-2xl"
+        >
+
+          <option>Pending</option>
+          <option>In Progress</option>
+          <option>Closed</option>
+
+        </select>
+
+        {/* REMARK */}
+
+        <textarea
+          placeholder="Remark"
+          value={remark}
+          onChange={(e) => setRemark(e.target.value)}
+          className="border border-gray-300 p-5 rounded-2xl"
+        />
 
       </div>
 
-      {/* Button */}
+      {/* BUTTON */}
 
       <button
         onClick={handleCreateTask}

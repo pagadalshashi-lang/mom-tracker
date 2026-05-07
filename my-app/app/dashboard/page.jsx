@@ -2,6 +2,7 @@
 
 import Sidebar from "@/app/components/Sidebar";
 import { useEffect, useState } from "react";
+import Image from "next/image";
 
 export default function DashboardPage() {
 
@@ -90,19 +91,19 @@ export default function DashboardPage() {
 
         {/* Header */}
 
-        <div className="flex justify-between items-center mb-10">
+        <div className="flex justify-between items-center mb-12">
 
-          <div>
+        <div>
 
-            <h1 className="text-5xl font-bold text-gray-800">
-              Dashboard
-            </h1>
+  <h1 className="text-5xl font-bold text-gray-800">
+    Dashboard
+  </h1>
 
-            <p className="text-gray-500 mt-2">
-              Welcome back to Mom Tracker
-            </p>
+  <p className="text-gray-500 mt-2">
+    Welcome back
+  </p>
 
-          </div>
+</div>
 
           {/* Profile */}
 
@@ -117,7 +118,7 @@ export default function DashboardPage() {
 
               <div className="w-12 h-12 rounded-full bg-blue-600 text-white flex items-center justify-center text-xl font-bold">
 
-                {user?.name?.charAt(0)}
+                {user?.fullName?.charAt(0)}
 
               </div>
 
@@ -126,7 +127,7 @@ export default function DashboardPage() {
               <div>
 
                 <h2 className="font-semibold text-gray-800">
-                  {user?.name}
+                  {user?.fullName}
                 </h2>
 
                 <p className="text-sm text-gray-500">
@@ -147,7 +148,7 @@ export default function DashboardPage() {
                   <div className="border-b pb-3">
 
                     <h2 className="font-bold text-lg text-gray-800">
-                      {user?.name}
+                      {user?.fullName}
                     </h2>
 
                     <p className="text-sm text-gray-500 mt-1">
@@ -195,7 +196,7 @@ export default function DashboardPage() {
           <div className="bg-white rounded-3xl p-8 shadow-lg hover:shadow-2xl transition">
 
             <h2 className="text-gray-500 text-xl">
-              Assigned
+              Assigned Tasks
             </h2>
 
             <h1 className="text-6xl font-bold text-blue-600 mt-6">
@@ -223,7 +224,7 @@ export default function DashboardPage() {
           <div className="bg-white rounded-3xl p-8 shadow-lg hover:shadow-2xl transition">
 
             <h2 className="text-gray-500 text-xl">
-              Closed
+              Closed Tasks
             </h2>
 
             <h1 className="text-6xl font-bold text-green-600 mt-6">
