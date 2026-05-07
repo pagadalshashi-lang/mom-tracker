@@ -73,9 +73,25 @@ export default function RegisterPage() {
 
       });
 
-      const data = await res.json();
+      // SAFE RESPONSE
 
-      console.log(data);
+      const text = await res.text();
+
+      console.log(text);
+
+      let data;
+
+      try {
+
+        data = JSON.parse(text);
+
+      } catch {
+
+        alert("Server Error");
+
+        return;
+
+      }
 
       if (res.ok) {
 
@@ -85,7 +101,7 @@ export default function RegisterPage() {
 
       } else {
 
-        alert(JSON.stringify(data));
+        alert(data.message || "Registration Failed");
 
       }
 
