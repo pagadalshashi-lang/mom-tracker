@@ -25,33 +25,33 @@ export default function Sidebar() {
 
       {/* Logo */}
 
-      <h1 className="text-4xl font-bold mb-14">
-        Mom Tracker
+      <h1 className="text-5xl font-bold mb-14 leading-tight">
+        Mom <br /> Tracker
       </h1>
 
       {/* Menu */}
 
-      <div className="flex flex-col gap-5">
+      <div className="flex flex-col gap-7">
 
         {/* Dashboard */}
 
         <Link
           href="/dashboard"
-          className="bg-blue-800 hover:bg-blue-700 px-5 py-4 rounded-2xl text-lg transition"
+          className="bg-blue-800 hover:bg-blue-700 px-7 py-5 rounded-3xl text-2xl font-medium transition duration-300"
         >
 
           Dashboard
 
         </Link>
 
-        {/* Employee Only */}
+        {/* Add Task */}
 
         {
           user?.role === "Employee" && (
 
             <Link
-              href="/add-task"
-              className="bg-blue-800 hover:bg-blue-700 px-5 py-4 rounded-2xl text-lg transition"
+              href="/dashboard/add-task"
+              className="bg-blue-800 hover:bg-blue-700 px-7 py-5 rounded-3xl text-2xl font-medium transition duration-300"
             >
 
               Add Task
@@ -65,7 +65,7 @@ export default function Sidebar() {
 
         <Link
           href="/reports"
-          className="bg-blue-800 hover:bg-blue-700 px-5 py-4 rounded-2xl text-lg transition"
+          className="bg-blue-800 hover:bg-blue-700 px-7 py-5 rounded-3xl text-2xl font-medium transition duration-300"
         >
 
           Reports
