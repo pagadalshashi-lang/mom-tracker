@@ -7,21 +7,6 @@ export default function ReportsPage() {
 
   const [assignedTasks, setAssignedTasks] = useState([]);
   const [selfTasks, setSelfTasks] = useState([]);
-  const [user, setUser] = useState(null);
-
-  // LOGGED USER
-
-  useEffect(() => {
-
-    const loggedUser = localStorage.getItem("user");
-
-    if (loggedUser) {
-
-      setUser(JSON.parse(loggedUser));
-
-    }
-
-  }, []);
 
   // FETCH TASKS
 
@@ -37,7 +22,7 @@ export default function ReportsPage() {
         localStorage.getItem("user")
       );
 
-      // ASSIGNED BY ME
+      // TASKS CREATED BY ME
 
       const creatorTasks = data.filter(
 
@@ -48,7 +33,7 @@ export default function ReportsPage() {
 
       );
 
-      // ASSIGNED TO ME
+      // TASKS ASSIGNED TO ME
 
       const myTasks = data.filter(
 
@@ -76,6 +61,8 @@ export default function ReportsPage() {
 
   };
 
+  // INITIAL LOAD
+
   useEffect(() => {
 
     fetchTasks();
@@ -85,8 +72,10 @@ export default function ReportsPage() {
   // UPDATE TASK
 
   const updateTask = async (
+
     taskId,
     updatedFields
+
   ) => {
 
     try {
@@ -113,9 +102,9 @@ export default function ReportsPage() {
 
       if (data.success) {
 
-        alert("Task Updated");
+        await fetchTasks();
 
-        fetchTasks();
+        alert("Task Updated Successfully");
 
       }
 
@@ -379,12 +368,16 @@ export default function ReportsPage() {
 
                       <input
                         type="date"
+                        disabled={
+                          task.status === "Closed"
+                        }
                         value={
                           task.actualStartDate || ""
                         }
                         onChange={(e) => {
 
-                          const updatedTasks = [...selfTasks];
+                          const updatedTasks =
+                            [...selfTasks];
 
                           updatedTasks[index]
                             .actualStartDate =
@@ -408,12 +401,16 @@ export default function ReportsPage() {
 
                       <input
                         type="date"
+                        disabled={
+                          task.status === "Closed"
+                        }
                         value={
                           task.actualEndDate || ""
                         }
                         onChange={(e) => {
 
-                          const updatedTasks = [...selfTasks];
+                          const updatedTasks =
+                            [...selfTasks];
 
                           updatedTasks[index]
                             .actualEndDate =
@@ -432,10 +429,17 @@ export default function ReportsPage() {
                     <td className="p-3">
 
                       <select
+
+                        disabled={
+                          task.status === "Closed"
+                        }
+
                         value={task.status}
+
                         onChange={(e) => {
 
-                          const updatedTasks = [...selfTasks];
+                          const updatedTasks =
+                            [...selfTasks];
 
                           updatedTasks[index].status =
                             e.target.value;
@@ -443,6 +447,7 @@ export default function ReportsPage() {
                           setSelfTasks(updatedTasks);
 
                         }}
+
                         className="border p-2 rounded-lg text-sm"
                       >
 
@@ -468,10 +473,17 @@ export default function ReportsPage() {
 
                       <input
                         type="text"
+
+                        disabled={
+                          task.status === "Closed"
+                        }
+
                         value={task.remark || ""}
+
                         onChange={(e) => {
 
-                          const updatedTasks = [...selfTasks];
+                          const updatedTasks =
+                            [...selfTasks];
 
                           updatedTasks[index].remark =
                             e.target.value;
@@ -479,7 +491,9 @@ export default function ReportsPage() {
                           setSelfTasks(updatedTasks);
 
                         }}
+
                         className="border p-2 rounded-lg text-sm"
+
                         placeholder="Remark"
                       />
 
@@ -490,8 +504,14 @@ export default function ReportsPage() {
                     <td className="p-3">
 
                       <button
-                        onClick={() =>
-                          updateTask(
+
+                        disabled={
+                          task.status === "Closed"
+                        }
+
+                        onClick={async () => {
+
+                          await updateTask(
 
                             task._id,
 
@@ -511,9 +531,21 @@ export default function ReportsPage() {
 
                             }
 
-                          )
+                          );
+
+                        }}
+
+                        className={`px-3 py-2 rounded-lg text-sm text-white
+
+                        ${
+                          task.status === "Closed"
+
+                            ? "bg-gray-400 cursor-not-allowed"
+
+                            : "bg-green-600 hover:bg-green-700"
                         }
-                        className="bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded-lg text-sm"
+                        
+                        `}
                       >
 
                         Save
