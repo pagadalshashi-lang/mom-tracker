@@ -153,7 +153,7 @@ export default function RegisterPage() {
 
                       employees
                         .filter((emp) =>
-                          emp.fullName
+                          emp.name
                             ?.toLowerCase()
                             .includes(fullName.toLowerCase())
                         )
@@ -161,11 +161,11 @@ export default function RegisterPage() {
 
                           <div
                             key={index}
-                            onClick={() => setFullName(emp.fullName)}
+                            onClick={() => setFullName(emp.name)}
                             className="p-4 hover:bg-gray-100 cursor-pointer border-b"
                           >
 
-                            {emp.fullName}
+                            {emp.name}
 
                           </div>
 
