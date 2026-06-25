@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-
+import { Eye, EyeOff } from "lucide-react";
 export default function RegisterPage() {
   const [employees, setEmployees] = useState([]);
   const [search, setSearch] = useState("");
@@ -12,7 +12,8 @@ export default function RegisterPage() {
     useState("");
   const [confirmPassword, setConfirmPassword] =
     useState("");
-
+const [showPassword, setShowPassword] = useState(false);
+const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   useEffect(() => {
     fetch("/api/hrms")
       .then((res) => res.json())
@@ -65,6 +66,8 @@ export default function RegisterPage() {
     selectedEmployee.email?.trim()
       ? selectedEmployee.email
       : selectedEmployee.personalEmail,
+
+      supportRole: selectedEmployee.supportRole,
   password,
 }),
         }
@@ -201,39 +204,69 @@ export default function RegisterPage() {
               />
             </div>
 
-            <div className="mb-4">
-              <label className="block mb-2 font-semibold text-[#3E7591]">
-                Password
-              </label>
+   <div className="mb-4">
+  <label className="block mb-2 font-semibold text-[#3E7591]">
+    Support Role
+  </label>
 
-              <input
-                type="password"
-                value={password}
-                onChange={(e) =>
-                  setPassword(
-                    e.target.value
-                  )
-                }
-                className="w-full border p-3 rounded-lg text-black focus:outline-none focus:ring-2 focus:ring-[#3E7591]"
-              />
-            </div>
+  <input
+    type="text"
+    readOnly
+    value={
+      selectedEmployee?.supportRole || ""
+    }
+    className="w-full border p-3 rounded-lg bg-gray-100 text-black"
+  />
+  </div>
 
-            <div className="mb-6">
-              <label className="block mb-2 font-semibold text-[#3E7591]">
-                Confirm Password
-              </label>
 
-              <input
-                type="password"
-                value={confirmPassword}
-                onChange={(e) =>
-                  setConfirmPassword(
-                    e.target.value
-                  )
-                }
-                className="w-full border p-3 rounded-lg text-black focus:outline-none focus:ring-2 focus:ring-[#3E7591]"
-              />
-            </div>
+     <div className="mb-4">
+  <label className="block mb-2 font-semibold text-[#3E7591]">
+    Password
+  </label>
+
+  <div className="relative">
+    <input
+      type={showPassword ? "text" : "password"}
+      value={password}
+      onChange={(e) => setPassword(e.target.value)}
+      className="w-full border p-3 rounded-lg pr-12 text-black focus:outline-none focus:ring-2 focus:ring-[#3E7591]"
+    />
+
+    <button
+      type="button"
+      onClick={() => setShowPassword(!showPassword)}
+      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"
+    >
+      {showPassword ? <EyeOff size={22} /> : <Eye size={22} />}
+    </button>
+  </div>
+</div>
+
+         <div className="relative">
+  <input
+    type={showConfirmPassword ? "text" : "password"}
+    value={confirmPassword}
+    onChange={(e) =>
+      setConfirmPassword(e.target.value)
+    }
+    className="w-full border p-3 rounded-lg pr-12 text-black focus:outline-none focus:ring-2 focus:ring-[#3E7591]"
+  />
+
+  <button
+    type="button"
+    onClick={() =>
+      setShowConfirmPassword(!showConfirmPassword)
+    }
+    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"
+  >
+    {showConfirmPassword ? (
+      <EyeOff size={22} />
+    ) : (
+      <Eye size={22} />
+    )}
+  </button>
+</div>
 
             <button
               onClick={handleRegister}

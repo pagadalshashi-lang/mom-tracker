@@ -13,19 +13,18 @@ export async function POST(req) {
       name,
       email,
       password,
+      supportRole, // NEW
     } = await req.json();
 
-    const existingUser =
-      await User.findOne({
-        email,
-      });
+    const existingUser = await User.findOne({
+      email,
+    });
 
     if (existingUser) {
       return NextResponse.json(
         {
           success: false,
-          message:
-            "User already registered",
+          message: "User already registered",
         },
         {
           status: 400,
@@ -33,36 +32,36 @@ export async function POST(req) {
       );
     }
 
-    const hashedPassword =
-      await bcrypt.hash(
-        password,
-        10
-      );
+    const hashedPassword = await bcrypt.hash(
+      password,
+      10
+    );
 
     await User.create({
       employeeCode,
       name,
       email,
-      password:
-        hashedPassword,
+      supportRole, // NEW
+      password: hashedPassword,
     });
 
     return NextResponse.json({
       success: true,
-      message:
-        "Registration Successful",
+      message: "Registration Successful",
     });
-  } catch (error) {
-  console.error("REGISTER ERROR:", error);
 
-  return NextResponse.json(
-    {
-      success: false,
-      message: error.message,
-    },
-    {
-      status: 500,
-    }
-  );
-}
+  } catch (error) {
+
+    console.error("REGISTER ERROR:", error);
+
+    return NextResponse.json(
+      {
+        success: false,
+        message: error.message,
+      },
+      {
+        status: 500,
+      }
+    );
+  }
 }
