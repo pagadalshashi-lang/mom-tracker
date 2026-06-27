@@ -226,6 +226,17 @@ return (
   </button>
 
   <button
+    onClick={() => setView("uploaded")}
+    className={`px-6 py-2 rounded-lg font-semibold transition ${
+      view === "uploaded"
+        ? "bg-[#3E7591] text-white"
+        : "bg-white border text-[#3E7591]"
+    }`}
+  >
+    Uploaded By Me
+  </button>
+
+  <button
     onClick={() => setView("team")}
     className={`px-6 py-2 rounded-lg font-semibold transition ${
       view === "team"

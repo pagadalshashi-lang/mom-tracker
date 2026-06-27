@@ -6,20 +6,23 @@ import Link from "next/link";
 export default function DashboardPage() {
 const [summary, setSummary] = useState(null);
 const [loading, setLoading] = useState(true);
+const [user, setUser] = useState(null);
 const [view, setView] = useState("my");
 const loadDashboard = async () => {
 try {
-const user = JSON.parse(
-localStorage.getItem("user")
+const loggedUser = JSON.parse(
+  localStorage.getItem("user")
 );
 
-  if (!user) {
+setUser(loggedUser);
+
+if (!loggedUser) {
     setLoading(false);
     return;
   }
 
   const response = await fetch(
-  `/api/dashboard/summary?email=${user.email}&view=${view}`
+  `/api/dashboard/summary?email=${loggedUser.email}&view=${view}`
 )
 
   const result = await response.json();

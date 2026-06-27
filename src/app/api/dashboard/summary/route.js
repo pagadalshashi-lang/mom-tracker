@@ -60,16 +60,38 @@ if (view === "my") {
     });
   }
 
-  // Same support role users
+// Same Team Users
+// BA & Head BA are treated as one team
 
-  const teamUsers = await User.find({
-    supportRole: loggedUser.supportRole,
-    email: { $ne: email }, // Exclude current user
-  });
+let supportRoles = [];
 
-  const teamEmails = teamUsers
-    .map((u) => u.email)
-    .filter(Boolean);
+if (
+  loggedUser.supportRole === "BA" ||
+  loggedUser.supportRole === "Head BA"
+) {
+  supportRoles = [
+    "BA",
+    "Head BA",
+  ];
+} else {
+  supportRoles = [
+    loggedUser.supportRole,
+  ];
+}
+
+const teamUsers = await User.find({
+  supportRole: {
+    $in: supportRoles,
+  },
+});
+
+const teamEmails = [];
+
+teamUsers.forEach((u) => {
+  if (u.email) {
+    teamEmails.push(u.email);
+  }
+});
 
   // Team uploaded MOM
 

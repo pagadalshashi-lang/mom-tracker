@@ -37,13 +37,17 @@ export async function GET() {
               24)
         );
 
-      if (diff <= 2) {
-        const emails = [
-          task.fprEmail,
-          task.fprPersonalEmail,
-          task.sprEmail,
-          task.sprPersonalEmail,
-        ].filter(Boolean);
+  if (diff === 2 || diff === 1 || diff <= 0) {
+      const emails = [
+  ...new Set(
+    [
+      task.fprEmail,
+      task.fprPersonalEmail,
+      task.sprEmail,
+      task.sprPersonalEmail,
+    ].filter(Boolean)
+  ),
+];
 
         if (
           emails.length > 0

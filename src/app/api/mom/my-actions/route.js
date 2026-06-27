@@ -29,6 +29,8 @@ export async function GET(req) {
 
 if (view === "my") {
 
+  // Tasks assigned to me
+
   actions = await MomAction.find({
     $or: [
       { fprEmail: email },
@@ -40,49 +42,78 @@ if (view === "my") {
     createdAt: -1,
   });
 
-} else {
+} else if (view === "uploaded") {
 
-  // Logged In User
-
-  const loggedUser = await User.findOne({
-    email,
-  });
-
-  if (!loggedUser) {
-    return NextResponse.json({
-      success: false,
-      message: "User not found",
-    });
-  }
-
-  // Same Support Role Users
-
-  const teamUsers = await User.find({
-    supportRole: loggedUser.supportRole,
-    email: { $ne: email }, // Exclude logged user
-  });
-
-  const teamEmails = [];
-
-  teamUsers.forEach((u) => {
-    if (u.email) {
-      teamEmails.push(u.email);
-    }
-  });
+  // Tasks uploaded by me
 
   actions = await MomAction.find({
-    $or: [
-      { fprEmail: { $in: teamEmails } },
-      { sprEmail: { $in: teamEmails } },
-      { fprPersonalEmail: { $in: teamEmails } },
-      { sprPersonalEmail: { $in: teamEmails } },
-    ],
+    uploadedByEmail: email,
   }).sort({
     createdAt: -1,
   });
 
+} else {
+
+ // Logged In User
+
+const loggedUser = await User.findOne({
+  email,
+});
+
+if (!loggedUser) {
+  return NextResponse.json({
+    success: false,
+    message: "User not found",
+  });
 }
 
+// BA & Head BA are one Team
+
+let supportRoles = [];
+
+if (
+  loggedUser.supportRole === "BA" ||
+  loggedUser.supportRole === "Head BA"
+) {
+  supportRoles = [
+    "BA",
+    "Head BA",
+  ];
+} else {
+  supportRoles = [
+    loggedUser.supportRole,
+  ];
+}
+
+// Same Team Users
+
+const teamUsers = await User.find({
+  supportRole: {
+    $in: supportRoles,
+  },
+});
+
+const teamEmails = [];
+
+teamUsers.forEach((u) => {
+  if (u.email) {
+    teamEmails.push(u.email);
+  }
+});
+
+actions = await MomAction.find({
+  $or: [
+    { fprEmail: { $in: teamEmails } },
+    { sprEmail: { $in: teamEmails } },
+    { fprPersonalEmail: { $in: teamEmails } },
+    { sprPersonalEmail: { $in: teamEmails } },
+    { uploadedByEmail: { $in: teamEmails } },
+  ],
+}).sort({
+  createdAt: -1,
+});
+
+}
     return NextResponse.json({
       success: true,
       data: actions,

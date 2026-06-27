@@ -13,11 +13,11 @@ export default function AssignedMomPage() {
 
       if (!user) return;
 
-      const res = await fetch(
-        `/api/mom/list?email=${encodeURIComponent(
-          user.email
-        )}&view=${view}`
-      );
+     const res = await fetch(
+  `/api/mom/list?email=${encodeURIComponent(
+    user.email
+  )}&view=${view}`
+);
 
       const result = await res.json();
 
@@ -52,31 +52,31 @@ export default function AssignedMomPage() {
 
       {/* Toggle */}
 
-      <div className="flex gap-4 mb-8">
+   <div className="flex gap-4 mb-8">
 
-        <button
-          onClick={() => setView("my")}
-          className={`px-6 py-2 rounded-lg font-semibold ${
-            view === "my"
-              ? "bg-[#3E7591] text-white"
-              : "bg-white border text-[#3E7591]"
-          }`}
-        >
-          My Tasks
-        </button>
+  <button
+    onClick={() => setView("my")}
+    className={`px-6 py-2 rounded-lg font-semibold ${
+      view === "my"
+        ? "bg-[#3E7591] text-white"
+        : "bg-white border text-[#3E7591]"
+    }`}
+  >
+    My Uploads
+  </button>
 
-        <button
-          onClick={() => setView("team")}
-          className={`px-6 py-2 rounded-lg font-semibold ${
-            view === "team"
-              ? "bg-[#3E7591] text-white"
-              : "bg-white border text-[#3E7591]"
-          }`}
-        >
-          My Team Tasks
-        </button>
+  <button
+    onClick={() => setView("team")}
+    className={`px-6 py-2 rounded-lg font-semibold ${
+      view === "team"
+        ? "bg-[#3E7591] text-white"
+        : "bg-white border text-[#3E7591]"
+    }`}
+  >
+    Team Uploads
+  </button>
 
-      </div>
+</div>
 
       <div className="bg-white rounded-xl shadow-lg overflow-x-auto">
 

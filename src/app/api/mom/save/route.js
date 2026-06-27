@@ -175,19 +175,40 @@ uploadedByEmail:
 
    if (validRows.length > 0) {
 
-  const savedRows =
-    await MomAction.insertMany(
-      validRows
-    );
+const rowsToSave = [];
+
+for (const row of validRows) {
+
+  const exists =
+    await MomAction.findOne({
+      mainPoint: row.mainPoint,
+      subPoint: row.subPoint,
+      uploadedByEmail: row.uploadedByEmail,
+    });
+
+  if (!exists) {
+    rowsToSave.push(row);
+  }
+
+}
+
+const savedRows =
+  await MomAction.insertMany(
+    rowsToSave
+  );
 
   for (const row of savedRows) {
 
-    const emails = [
+   const emails = [
+  ...new Set(
+    [
       row.fprEmail,
       row.fprPersonalEmail,
       row.sprEmail,
       row.sprPersonalEmail,
-    ].filter(Boolean);
+    ].filter(Boolean)
+  ),
+];
 
     if (emails.length > 0) {
 
@@ -241,15 +262,15 @@ uploadedByEmail:
       success: true,
 
       savedCount:
-        validRows.length,
+  rowsToSave.length,
 
       invalidCount:
         invalidRows.length,
 
       invalidRows,
 
-      message:
-        `${validRows.length} rows uploaded successfully`,
+   message:
+  `${rowsToSave.length} rows uploaded successfully`,
     });
 
   } catch (error) {

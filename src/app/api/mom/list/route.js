@@ -47,25 +47,47 @@ if (view === "my") {
       message: "User not found",
     });
   }
+// BA & Head BA are one Team
 
-  // Same Support Role Team
+let supportRoles = [];
 
-  const teamUsers = await User.find({
-    supportRole: loggedUser.supportRole,
-    email: { $ne: email }, // Exclude current user
-  });
+if (
+  loggedUser.supportRole === "BA" ||
+  loggedUser.supportRole === "Head BA"
+) {
+  supportRoles = [
+    "BA",
+    "Head BA",
+  ];
+} else {
+  supportRoles = [
+    loggedUser.supportRole,
+  ];
+}
 
-  const teamEmails = teamUsers
-    .map((u) => u.email)
-    .filter(Boolean);
+// Same Team Users
 
-  data = await MomAction.find({
-    uploadedByEmail: {
-      $in: teamEmails,
-    },
-  }).sort({
-    createdAt: -1,
-  });
+const teamUsers = await User.find({
+  supportRole: {
+    $in: supportRoles,
+  },
+});
+
+const teamEmails = [];
+
+teamUsers.forEach((u) => {
+  if (u.email) {
+    teamEmails.push(u.email);
+  }
+});
+
+data = await MomAction.find({
+  uploadedByEmail: {
+    $in: teamEmails,
+  },
+}).sort({
+  createdAt: -1,
+});
 
 }
 
