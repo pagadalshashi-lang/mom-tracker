@@ -43,52 +43,20 @@ export async function POST(req) {
       );
     }
 
-    // ============================
-    // GET SUPPORT ROLE FROM HRMS
-    // ============================
-
-    let supportRole = "";
-
-    try {
-      const hrmsResponse = await fetch(
-        `${process.env.NEXT_PUBLIC_BASE_URL || ""}/api/hrms`
-      );
-
-      const employees = await hrmsResponse.json();
-
-      const emp = employees.find(
-        (x) =>
-          x.email?.toLowerCase() ===
-          email.toLowerCase()
-      );
-
-      if (emp) {
-        supportRole =
-          emp.supportRole || "";
-      }
-    } catch (err) {
-      console.log(
-        "HRMS Error",
-        err.message
-      );
-    }
-
+   
     return NextResponse.json({
-      success: true,
-      message: "Login Successful",
+  success: true,
+  message: "Login Successful",
 
-      user: {
-        employeeCode:
-          user.employeeCode,
+  user: {
+    employeeCode: user.employeeCode,
+    name: user.name,
+    email: user.email,
+    supportRole: user.supportRole,
+  },
+});
 
-        name: user.name,
-
-        email: user.email,
-
-        supportRole,
-      },
-    });
-
+  
   } catch (error) {
 
     console.error(

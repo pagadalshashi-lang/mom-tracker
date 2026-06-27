@@ -6,7 +6,7 @@ import Link from "next/link";
 export default function DashboardPage() {
 const [summary, setSummary] = useState(null);
 const [loading, setLoading] = useState(true);
-
+const [view, setView] = useState("my");
 const loadDashboard = async () => {
 try {
 const user = JSON.parse(
@@ -19,8 +19,8 @@ localStorage.getItem("user")
   }
 
   const response = await fetch(
-    `/api/dashboard/summary?email=${user.email}`
-  );
+  `/api/dashboard/summary?email=${user.email}&view=${view}`
+)
 
   const result = await response.json();
 
@@ -36,8 +36,8 @@ localStorage.getItem("user")
 };
 
 useEffect(() => {
-loadDashboard();
-}, []);
+  loadDashboard();
+}, [view]);
 
 if (loading) {
 return ( <div className="min-h-screen flex justify-center items-center">
@@ -50,6 +50,33 @@ return ( <div className="min-h-screen bg-gray-100 p-8">
   <h1 className="text-5xl font-bold text-center text-[#3E7591] mb-10">
     MOM Tracker Dashboard
   </h1>
+
+<div className="flex justify-center gap-4 mb-8">
+
+  <button
+    onClick={() => setView("my")}
+    className={`px-8 py-3 rounded-lg font-semibold transition ${
+      view === "my"
+        ? "bg-[#3E7591] text-white"
+        : "bg-white border text-[#3E7591]"
+    }`}
+  >
+    My Tasks
+  </button>
+
+  <button
+    onClick={() => setView("team")}
+    className={`px-8 py-3 rounded-lg font-semibold transition ${
+      view === "team"
+        ? "bg-[#3E7591] text-white"
+        : "bg-white border text-[#3E7591]"
+    }`}
+  >
+    My Team Tasks
+  </button>
+
+</div>
+
 
   {/* Top Cards */}
 
@@ -66,9 +93,11 @@ return ( <div className="min-h-screen bg-gray-100 p-8">
             Assigned MOM Pointer
           </h2>
 
-          <p className="text-gray-600 mt-2">
-            MOM uploaded by me
-          </p>
+        <p className="text-gray-600 mt-2">
+  {view === "my"
+    ? "MOM uploaded by me"
+    : "MOM uploaded by my team"}
+</p>
         </div>
 
         <div className="text-8xl font-extrabold text-[#3E7591]">
@@ -89,9 +118,12 @@ return ( <div className="min-h-screen bg-gray-100 p-8">
             Self MOM Pointer
           </h2>
 
-          <p className="text-gray-600 mt-2">
-            MOM assigned to me
-          </p>
+        <p className="text-gray-600 mt-2">
+  {view === "my"
+    ? "MOM assigned to me"
+    : "MOM assigned to my team"}
+</p>
+
         </div>
 
         <div className="text-8xl font-extrabold text-[#3E7591]">

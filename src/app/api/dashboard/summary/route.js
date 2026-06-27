@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 
 import connectDB from "@/lib/mongodb";
 import MomAction from "@/models/MomAction";
+import User from "@/models/User";
 
 export async function GET(req) {
 try {
@@ -13,6 +14,7 @@ const { searchParams } =
 
 const email =
   searchParams.get("email");
+  const view = searchParams.get("view") || "my";
 
 if (!email) {
   return NextResponse.json(
@@ -25,34 +27,70 @@ if (!email) {
     }
   );
 }
+let assignedMom = [];
+let selfMom = [];
 
-// MOM Uploaded By Me
+if (view === "my") {
 
-const assignedMom =
-  await MomAction.find({
+  assignedMom = await MomAction.find({
     uploadedByEmail: email,
   });
 
-// MOM Assigned To Me
-
-const selfMom =
-  await MomAction.find({
+  selfMom = await MomAction.find({
     $or: [
-      {
-        fprEmail: email,
-      },
-      {
-        sprEmail: email,
-      },
-      {
-        fprPersonalEmail: email,
-      },
-      {
-        sprPersonalEmail: email,
-      },
+      { fprEmail: email },
+      { sprEmail: email },
+      { fprPersonalEmail: email },
+      { sprPersonalEmail: email },
     ],
   });
 
+} else {
+
+  // Logged-in user
+
+  const loggedUser = await User.findOne({
+    email,
+  });
+
+  if (!loggedUser) {
+    return NextResponse.json({
+      success: false,
+      message: "User not found",
+    });
+  }
+
+  // Same support role users
+
+  const teamUsers = await User.find({
+    supportRole: loggedUser.supportRole,
+    email: { $ne: email }, // Exclude current user
+  });
+
+  const teamEmails = teamUsers
+    .map((u) => u.email)
+    .filter(Boolean);
+
+  // Team uploaded MOM
+
+  assignedMom = await MomAction.find({
+    uploadedByEmail: {
+      $in: teamEmails,
+    },
+  });
+
+  // Team assigned MOM
+
+  selfMom = await MomAction.find({
+    $or: [
+      { fprEmail: { $in: teamEmails } },
+      { sprEmail: { $in: teamEmails } },
+      { fprPersonalEmail: { $in: teamEmails } },
+      { sprPersonalEmail: { $in: teamEmails } },
+    ],
+  });
+
+}
 const getStatusCount = (
   data,
   status

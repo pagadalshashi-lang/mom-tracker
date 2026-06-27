@@ -145,21 +145,21 @@ uploadedByEmail:
 }
         if (errors.length > 0) {
 
-          invalidRows.push({
-            rowNumber:
-              index + 1,
+         invalidRows.push({
+  index, // ADD THIS
 
-            mainPoint:
-              row.mainPoint,
+  rowNumber: index + 1,
 
-            fpr:
-              row.fpr,
+  mainPoint: row.mainPoint,
 
-            spr:
-              row.spr,
+  subPoint: row.subPoint,
 
-            errors,
-          });
+  fpr: row.fpr,
+
+  spr: row.spr,
+
+  errors,
+});
 
         } else {
 

@@ -6,6 +6,7 @@ export default function MyActionsPage() {
 const [actions, setActions] = useState([]);
 const [loading, setLoading] = useState(true);
 const [selectedTask, setSelectedTask] = useState(null);
+const [view, setView] = useState("my");
  useEffect(() => {
   if (selectedTask) {
     document.body.style.overflow = "hidden";
@@ -19,15 +20,15 @@ const [selectedTask, setSelectedTask] = useState(null);
 }, [selectedTask]);
 
 
-  useEffect(() => {
+useEffect(() => {
   loadActions();
 
   const interval = setInterval(() => {
     loadActions();
-  }, 30000); // 30 sec
+  }, 30000);
 
   return () => clearInterval(interval);
-}, []);
+}, [view]);
   const loadActions = async () => {
     try {
       const user = JSON.parse(
@@ -36,10 +37,10 @@ const [selectedTask, setSelectedTask] = useState(null);
 
       if (!user) return;
 
-      const response = await fetch(
+    const response = await fetch(
   `/api/mom/my-actions?email=${encodeURIComponent(
     user.email
-  )}`
+  )}&view=${view}`
 );
 
       const result = await response.json();
@@ -205,17 +206,43 @@ return (
 
     {/* Header */}
     <div className="flex justify-between items-center mb-6">
-      <h1 className="text-4xl font-bold text-[#3E7591]">
-        My Actions
-      </h1>
+     <h1 className="text-4xl font-bold text-[#3E7591]">
+  {view === "my" ? "My Actions" : "Team Actions"}
+</h1>
 
       
     </div>
+<div className="flex gap-4 mt-5 mb-6">
 
+  <button
+    onClick={() => setView("my")}
+    className={`px-6 py-2 rounded-lg font-semibold transition ${
+      view === "my"
+        ? "bg-[#3E7591] text-white"
+        : "bg-white border text-[#3E7591]"
+    }`}
+  >
+    My Tasks
+  </button>
+
+  <button
+    onClick={() => setView("team")}
+    className={`px-6 py-2 rounded-lg font-semibold transition ${
+      view === "team"
+        ? "bg-[#3E7591] text-white"
+        : "bg-white border text-[#3E7591]"
+    }`}
+  >
+    My Team Tasks
+  </button>
+
+</div>
     {actions.length === 0 ? (
 
       <div className="bg-white rounded-xl shadow-lg p-10 text-center">
-        No Assigned Tasks
+       {view === "my"
+  ? "No Assigned Tasks"
+  : "No Team Tasks"}
       </div>
 
     ) : (
@@ -228,7 +255,11 @@ return (
   <tr>
     <th className="p-4 text-left w-[120px]">Main Point</th>
     <th className="p-4 text-left">Sub Point</th>
-    <th className="p-4 text-left w-[180px]">Assigned By</th>
+   <th className="p-4 text-left w-[180px]">
+  {view === "my"
+    ? "Assigned By"
+    : "Uploaded By"}
+</th>
     <th className="p-4 text-left w-[180px]">FPR</th>
     <th className="p-4 text-left w-[180px]">SPR</th>
     <th className="p-4 text-center w-[130px]"> Plan End </th>

@@ -7,6 +7,7 @@ export default function UploadMomPage() {
   const [data, setData] = useState([]);
   const [employees, setEmployees] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
 
   const [invalidRows, setInvalidRows] =
   useState([]);
@@ -95,6 +96,10 @@ const handleUpload = async () => {
   }
 };
   const handleSave = async () => {
+if (saving) return;
+
+setSaving(true);
+
   try {
 
     const user = JSON.parse(
@@ -124,7 +129,7 @@ console.log(data);
         }),
       }
     );
-
+  
     const result =
       await response.json();
 
@@ -141,51 +146,40 @@ console.log(data);
       setInvalidRows(
   result.invalidRows || []
 );
+const failedRows =
+  result.invalidRows || [];
 
 if (result.invalidCount > 0) {
 
-  const failedRows =
-    result.invalidRows || [];
-
-  setData(
-    data.filter((row) =>
+  setData((prevData) =>
+    prevData.filter((_, index) =>
       failedRows.some(
-        (f) =>
-          f.mainPoint ===
-          row["Main Point"]
+        (f) => f.index === index
       )
     )
   );
+
+  alert(
+    `${result.savedCount} Rows Uploaded\n${result.invalidCount} Rows Failed`
+  );
+
+} else {
+
+  alert(
+    `${result.savedCount} Rows Uploaded Successfully`
+  );
+
+  setData([]);
+
+  setTimeout(() => {
+    window.location.href =
+      "/dashboard/mom-list";
+  }, 1500);
 }
-
-if (
-  result.invalidCount === 0
-) {
-
-        alert(
-          `${result.savedCount} Rows Uploaded Successfully`
-        );
-
-        setData([]);
-
-   setTimeout(() => {
-  window.location.href =
-    "/dashboard/mom-list";
-}, 1500);
-      } else {
-
-        alert(
-          `${result.savedCount} Rows Uploaded\n${result.invalidCount} Rows Failed`
-        );
-
-      }
 
     } else {
 
-      alert(
-        result.message ||
-          "Save Failed"
-      );
+      alert(result.message || "Save Failed");
 
     }
 
@@ -194,12 +188,18 @@ if (
     console.error(error);
 
     alert(
-      error.message ||
-        "Save Failed"
+      error.message || "Save Failed"
     );
+
+  } finally {
+
+    setSaving(false);
+
   }
+
 };
-  
+
+
   return (
     <div className="min-h-screen bg-gray-100 p-2">
       <div className="w-full bg-white rounded-2xl shadow-lg p-4">
@@ -526,9 +526,7 @@ temp[index]
   {row["Actual End Date"]}
 </td>
 
-            
-
-            <td className="border p-2 text-black align-top">
+              <td className="border p-2 text-black align-top">
 
               <input
                 type="text"
@@ -651,10 +649,10 @@ SPR :
             <div className="mt-6">
               <button
   onClick={handleSave}
-  disabled={data.length === 0}
+disabled={saving || data.length === 0}
   className="bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white px-8 py-3 rounded-lg font-semibold"
 >
-  Save
+{saving ? "Saving..." : "Save"}
 </button>
             </div>
           </>
