@@ -83,7 +83,8 @@ uploadedByEmail:
     // ==========================
 
     const validRows = [];
-    const invalidRows = [];
+const invalidRows = [];
+const rowsToSave = [];
 
     formattedData.forEach(
       (row, index) => {

@@ -1,7 +1,7 @@
 export async function GET() {
   try {
     const response = await fetch(
-      "https://pockethrmsapi.azurewebsites.net/api/EmployeeMaster/GetEmployeeMaster",
+      "https://api.pockethrms.com/api/EmployeeMaster/GetEmployeeMaster",
       {
         method: "GET",
         headers: {
