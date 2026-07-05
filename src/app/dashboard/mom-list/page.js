@@ -5,8 +5,10 @@ import { useEffect, useState } from "react";
 export default function MomListPage() {
   const [data, setData] = useState([]);
   const [search, setSearch] = useState("");
-  const [statusFilter, setStatusFilter] =
-    useState("All");
+ const [statusFilter, setStatusFilter] =
+  useState("All");
+
+const [view, setView] = useState("my");
 
  const loadData = async () => {
   try {
@@ -16,11 +18,11 @@ export default function MomListPage() {
     );
       if (!user) return;
 
-    const response = await fetch(
-      `/api/mom/list?email=${encodeURIComponent(
-        user.email
-      )}`
-    );
+  const response = await fetch(
+  `/api/mom/list?email=${encodeURIComponent(
+    user.email
+  )}&view=${view}`
+);
       const result =
         await response.json();
 
@@ -31,8 +33,13 @@ export default function MomListPage() {
       console.error(error);
     }
   };
+useEffect(() => {
+  loadData();
+}, [view]);
 
 useEffect(() => {
+  loadData();
+
   const interval = setInterval(() => {
     loadData();
   }, 10000);
@@ -92,7 +99,46 @@ useEffect(() => {
 
         </div>
 
-        {/* Filters */}
+
+<div className="flex gap-4 mb-6">
+
+  <button
+    onClick={() => setView("my")}
+    className={`px-5 py-2 rounded-lg font-semibold ${
+      view === "my"
+        ? "bg-[#3E7591] text-white"
+        : "bg-white border text-[#3E7591]"
+    }`}
+  >
+    My MOMs
+  </button>
+
+  <button
+    onClick={() => setView("uploaded")}
+    className={`px-5 py-2 rounded-lg font-semibold ${
+      view === "uploaded"
+        ? "bg-[#3E7591] text-white"
+        : "bg-white border text-[#3E7591]"
+    }`}
+  >
+    Uploaded By Me
+  </button>
+
+  <button
+    onClick={() => setView("team")}
+    className={`px-5 py-2 rounded-lg font-semibold ${
+      view === "team"
+        ? "bg-[#3E7591] text-white"
+        : "bg-white border text-[#3E7591]"
+    }`}
+  >
+    My Team MOMs
+  </button>
+
+</div>
+
+{/* Filters */}
+      
 
         <div className="bg-white rounded-xl shadow p-4 mb-6">
 
@@ -152,179 +198,120 @@ useEffect(() => {
           {" "}
           {filteredData.length}
         </div>
+<div className="bg-white rounded-xl shadow overflow-x-auto">
 
-        {/* Cards */}
+<table className="min-w-full border-collapse">
 
-        <div className="grid gap-5">
+<thead className="bg-[#3E7591] text-white sticky top-0">
 
-          {filteredData.length >
-          0 ? (
+<tr>
 
-            filteredData.map(
-              (row) => (
+<th className="p-3 border">Main Point</th>
 
-                <div
-                  key={row._id}
-                  className="bg-white rounded-xl shadow-lg p-6 border"
-                >
+<th className="p-3 border">Sub Point</th>
 
-                  {/* Header */}
+<th className="p-3 border">FPR</th>
 
-                  <div className="flex justify-between items-center mb-4">
+<th className="p-3 border">SPR</th>
 
-                    <h2 className="text-2xl font-bold text-[#3E7591]">
-                      {row.mainPoint}
-                    </h2>
+<th className="p-3 border">Plan Start</th>
 
-                    <span
-                      className={`px-4 py-1 rounded-full text-sm font-semibold
-                      ${
-                        row.status ===
-                        "Closed"
-                          ? "bg-green-100 text-green-700"
+<th className="p-3 border">Plan End</th>
 
-                          : row.status ===
-                            "In Process"
-                          ? "bg-yellow-100 text-yellow-700"
+<th className="p-3 border">Actual Start</th>
 
-                          : row.status ===
-                            "Pending"
-                          ? "bg-orange-100 text-orange-700"
+<th className="p-3 border">Actual End</th>
 
-                          : "bg-red-100 text-red-700"
-                      }`}
-                    >
-                      {row.status}
-                    </span>
+<th className="p-3 border">Status</th>
 
-                  </div>
+<th className="p-3 border">Remark</th>
 
-                  {/* Sub Point */}
+</tr>
 
-                  <div className="mb-4">
+</thead>
 
-                    <label className="font-semibold text-gray-700">
-                      Sub Point
-                    </label>
+<tbody>
 
-                    <p className="text-black mt-1">
-                      {row.subPoint}
-                    </p>
+{filteredData.length > 0 ? (
 
-                  </div>
+filteredData.map((row,index)=>(
 
-                  {/* FPR SPR */}
+<tr
+key={row._id}
+className={`hover:bg-blue-50 ${
+index % 2 === 0 ? "bg-white" : "bg-gray-50"
+}`}
+>
 
-                  <div className="grid md:grid-cols-2 gap-4 mb-4">
+<td className="border p-2 text-black">{row.mainPoint}</td>
 
-                    <div>
+<td className="border p-2 text-black">{row.subPoint}</td>
 
-                      <label className="font-semibold text-gray-700">
-                        FPR
-                      </label>
+<td className="border p-2 text-black">{row.fpr}</td>
 
-                      <p className="text-black">
-                        {row.fpr}
-                      </p>
+<td className="border p-2 text-black">{row.spr}</td>
 
-                    </div>
+<td className="border p-2 text-black">{row.planStartDate}</td>
 
-                    <div>
+<td className="border p-2 text-black">{row.planEndDate}</td>
 
-                      <label className="font-semibold text-gray-700">
-                        SPR
-                      </label>
+<td className="border p-2 text-black">{row.actualStartDate}</td>
 
-                      <p className="text-black">
-                        {row.spr}
-                      </p>
+<td className="border p-2 text-black">{row.actualEndDate}</td>
 
-                    </div>
+<td className="border p-2 text-black">
 
-                  </div>
+<span
+className={`px-3 py-1 rounded-full text-xs font-semibold
+${
+row.status==="Closed"
+?"bg-green-100 text-green-700"
+:row.status==="In Process"
+?"bg-yellow-100 text-yellow-700"
+:row.status==="Pending"
+?"bg-orange-100 text-orange-700"
+:"bg-red-100 text-red-700"
+}`}
+>
 
-                  {/* Dates */}
+{row.status}
 
-                  <div className="grid md:grid-cols-4 gap-4 mb-4">
+</span>
 
-                    <div>
+</td>
 
-                      <label className="font-semibold text-gray-700">
-                        Plan Start
-                      </label>
+<td className="border p-2 whitespace-pre-wrap">
+{row.remark}
+</td>
 
-                      <p className="text-black">
-                        {row.planStartDate}
-                      </p>
+</tr>
 
-                    </div>
+))
 
-                    <div>
+):(
 
-                      <label className="font-semibold text-gray-700">
-                        Actual Start
-                      </label>
 
-                      <p className="text-black">
-                        {row.actualStartDate}
-                      </p>
+<tr>
 
-                    </div>
+<td
+colSpan="10"
+className="text-center p-10 text-gray-500"
+>
 
-                    <div>
+No MOM Actions Found
 
-                      <label className="font-semibold text-gray-700">
-                        Plan End
-                      </label>
+</td>
 
-                      <p className="text-black">
-                        {row.planEndDate}
-                      </p>
+</tr>
 
-                    </div>
+)}
 
-                    <div>
+</tbody>
 
-                      <label className="font-semibold text-gray-700">
-                        Actual End
-                      </label>
+</table>
 
-                      <p className="text-black">
-                        {row.actualEndDate}
-                      </p>
-
-                    </div>
-
-                  </div>
-
-                  {/* Remark */}
-
-                  <div>
-
-                    <label className="font-semibold text-gray-700">
-                      Remark
-                    </label>
-
-                    <p className="text-black mt-1">
-                      {row.remark}
-                    </p>
-
-                  </div>
-
-                </div>
-              )
-            )
-
-          ) : (
-
-            <div className="bg-white p-10 rounded-xl text-center text-gray-500">
-              No MOM Actions Found
-            </div>
-
-          )}
-
-        </div>
-
+</div>
+  
       </div>
 
     </div>

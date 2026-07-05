@@ -22,10 +22,26 @@ const view = searchParams.get("view") || "my";
         }
       );
     }
-
-   let data = [];
+let data = [];
 
 if (view === "my") {
+
+  // My MOMs (Assigned to me)
+
+  data = await MomAction.find({
+    $or: [
+      { fprEmail: email },
+      { sprEmail: email },
+      { fprPersonalEmail: email },
+      { sprPersonalEmail: email },
+    ],
+  }).sort({
+    createdAt: -1,
+  });
+
+} else if (view === "uploaded") {
+
+  // Uploaded By Me
 
   data = await MomAction.find({
     uploadedByEmail: email,
@@ -47,54 +63,58 @@ if (view === "my") {
       message: "User not found",
     });
   }
-// BA & Head BA are one Team
 
-let supportRoles = [];
+  // BA & Head BA are one Team
 
-if (
-  loggedUser.supportRole === "BA" ||
-  loggedUser.supportRole === "Head BA"
-) {
-  supportRoles = [
-    "BA",
-    "Head BA",
-  ];
-} else {
-  supportRoles = [
-    loggedUser.supportRole,
-  ];
-}
+  let supportRoles = [];
 
-// Same Team Users
-
-const teamUsers = await User.find({
-  supportRole: {
-    $in: supportRoles,
-  },
-});
-
-const teamEmails = [];
-
-teamUsers.forEach((u) => {
-  if (u.email) {
-    teamEmails.push(u.email);
+  if (
+    loggedUser.supportRole === "BA" ||
+    loggedUser.supportRole === "Head BA"
+  ) {
+    supportRoles = [
+      "BA",
+      "Head BA",
+    ];
+  } else {
+    supportRoles = [
+      loggedUser.supportRole,
+    ];
   }
-});
 
-data = await MomAction.find({
-  uploadedByEmail: {
-    $in: teamEmails,
-  },
-}).sort({
-  createdAt: -1,
-});
+  // Same Team Users
+
+  const teamUsers = await User.find({
+    supportRole: {
+      $in: supportRoles,
+    },
+  });
+
+  const teamEmails = [];
+
+  teamUsers.forEach((u) => {
+    if (u.email) {
+      teamEmails.push(u.email);
+    }
+  });
+
+  data = await MomAction.find({
+    $or: [
+      { fprEmail: { $in: teamEmails } },
+      { sprEmail: { $in: teamEmails } },
+      { fprPersonalEmail: { $in: teamEmails } },
+      { sprPersonalEmail: { $in: teamEmails } },
+      { uploadedByEmail: { $in: teamEmails } },
+    ],
+  }).sort({
+    createdAt: -1,
+  });
 
 }
-
-    return NextResponse.json({
-      success: true,
-      data,
-    });
+return NextResponse.json({
+  success: true,
+  data,
+});
 
   } catch (error) {
     console.error("MOM LIST ERROR:", error);
