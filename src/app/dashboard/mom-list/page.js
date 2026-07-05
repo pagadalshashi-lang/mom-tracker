@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import * as XLSX from "xlsx";
+
 
 export default function MomListPage() {
   const [data, setData] = useState([]);
@@ -33,19 +35,42 @@ const [view, setView] = useState("my");
       console.error(error);
     }
   };
-useEffect(() => {
-  loadData();
-}, [view]);
+
 
 useEffect(() => {
   loadData();
 
   const interval = setInterval(() => {
     loadData();
-  }, 10000);
+  }, 30000); // Refresh every 30 seconds
+ return () => clearInterval(interval);
 
-  return () => clearInterval(interval);
-}, []);
+},[view]);
+
+const downloadExcel = () => {
+
+  const exportData = filteredData.map((row) => ({
+    "Main Point": row.mainPoint,
+    "Sub Point": row.subPoint,
+    "FPR": row.fpr,
+    "SPR": row.spr,
+    "Uploaded By": row.uploadedBy || row.uploadedByName || row.uploadedByEmail,
+    "Plan Start": row.planStartDate,
+    "Plan End": row.planEndDate,
+    "Actual Start": row.actualStartDate,
+    "Actual End": row.actualEndDate,
+    Status: row.status,
+    Remark: row.remark,
+  }));
+
+  const ws = XLSX.utils.json_to_sheet(exportData);
+  const wb = XLSX.utils.book_new();
+
+  XLSX.utils.book_append_sheet(wb, ws, "MOM List");
+
+  XLSX.writeFile(wb, "MOM_List.xlsx");
+
+};
 
   const filteredData = data.filter(
     (item) => {
@@ -197,6 +222,15 @@ useEffect(() => {
           Total Actions :
           {" "}
           {filteredData.length}
+<button
+onClick={downloadExcel}
+className="bg-green-600 hover:bg-green-700 text-white px-5 py-2 rounded-lg"
+>
+
+Download Excel
+
+</button>
+
         </div>
 <div className="bg-white rounded-xl shadow overflow-x-auto">
 
@@ -213,6 +247,8 @@ useEffect(() => {
 <th className="p-3 border">FPR</th>
 
 <th className="p-3 border">SPR</th>
+
+<th className="p-3 border">Uploaded By</th>
 
 <th className="p-3 border">Plan Start</th>
 
@@ -250,6 +286,10 @@ index % 2 === 0 ? "bg-white" : "bg-gray-50"
 <td className="border p-2 text-black">{row.fpr}</td>
 
 <td className="border p-2 text-black">{row.spr}</td>
+
+<td className="border p-2 text-black">
+  {row.uploadedBy || row.uploadedByName}
+</td>
 
 <td className="border p-2 text-black">{row.planStartDate}</td>
 
