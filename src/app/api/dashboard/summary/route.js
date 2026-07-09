@@ -61,17 +61,17 @@ if (view === "my") {
   }
 
 // Same Team Users
-// BA & Head BA are treated as one team
+// BA & Head-BA are treated as one team
 
 let supportRoles = [];
 
 if (
   loggedUser.supportRole === "BA" ||
-  loggedUser.supportRole === "Head BA"
+  loggedUser.supportRole === "Head-BA"
 ) {
   supportRoles = [
     "BA",
-    "Head BA",
+    "Head-BA",
   ];
 } else {
   supportRoles = [

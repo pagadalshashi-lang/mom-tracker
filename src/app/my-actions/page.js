@@ -6,9 +6,26 @@ export default function MyActionsPage() {
   const [actions, setActions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedTask, setSelectedTask] = useState(null);
-  useEffect(() => {
-    loadActions();
-  }, []);
+  const [statusFilter, setStatusFilter] = useState("All");
+const [uploadedByFilter, setUploadedByFilter] = useState("All");
+const [planStartFilter, setPlanStartFilter] = useState("");
+const [planEndFilter, setPlanEndFilter] = useState("");
+
+const [page, setPage] = useState(1);
+const [totalPages, setTotalPages] = useState(1);
+const [uploadedByList, setUploadedByList] = useState([]);
+
+const limit = 20;
+
+ useEffect(() => {
+  loadActions();
+}, [
+  statusFilter,
+  uploadedByFilter,
+  planStartFilter,
+  planEndFilter,
+  page,
+]);
 
   const loadActions = async () => {
     try {
@@ -22,15 +39,23 @@ export default function MyActionsPage() {
       }
 
   
-     const response = await fetch(
-  `/api/mom/my-actions?email=${encodeURIComponent(user.email)}`
+const response = await fetch(
+  `/api/mom/my-actions?email=${encodeURIComponent(user.email)}
+  &status=${statusFilter}
+  &uploadedBy=${uploadedByFilter}
+  &planStartDate=${planStartFilter}
+  &planEndDate=${planEndFilter}
+  &page=${page}
+  &limit=${limit}`
 );
       const result =
         await response.json();
 
       if (result.success) {
-        setActions(result.data);
-      }
+  setActions(result.data);
+  setUploadedByList(result.uploadedByList);
+  setTotalPages(result.totalPages);
+}
     } catch (error) {
       console.error(error);
     } finally {
@@ -153,7 +178,50 @@ export default function MyActionsPage() {
         <h1 className="text-4xl font-bold text-[#3E7591] mb-8">
           My Actions
         </h1>
+<div className="bg-white p-4 rounded-lg shadow mb-6">
 
+  <div className="grid md:grid-cols-4 gap-4">
+
+    <select
+      value={statusFilter}
+      onChange={(e)=>setStatusFilter(e.target.value)}
+      className="border rounded-lg p-2"
+    >
+      <option value="All">All Status</option>
+      <option value="Open">Open</option>
+      <option value="In Process">In Process</option>
+      <option value="Pending">Pending</option>
+      <option value="Closed">Closed</option>
+    </select>
+
+    <input
+      type="date"
+      value={planStartFilter}
+      onChange={(e)=>setPlanStartFilter(e.target.value)}
+      className="border rounded-lg p-2"
+    />
+
+    <input
+      type="date"
+      value={planEndFilter}
+      onChange={(e)=>setPlanEndFilter(e.target.value)}
+      className="border rounded-lg p-2"
+    />
+
+    <button
+      onClick={()=>{
+        setStatusFilter("All");
+        setPlanStartFilter("");
+        setPlanEndFilter("");
+      }}
+      className="bg-red-500 text-white rounded-lg"
+    >
+      Reset
+    </button>
+
+  </div>
+
+</div>
         {actions.length === 0 ? (
           <div className="bg-white p-10 rounded-xl shadow text-center text-gray-500">
             No Assigned Tasks
@@ -352,14 +420,10 @@ export default function MyActionsPage() {
   </label>
 <input
   type="date"
-  value={
-    selectedTask.actualStartDate || ""
-  }
+ value={row.actualStartDate || ""}
   onChange={(e) => {
 
-    if (
-      selectedTask.actualStartDate
-    ) {
+    if (row.actualStartDate) {
       alert(
         "Actual Start Date already set"
       );
@@ -369,10 +433,7 @@ export default function MyActionsPage() {
     const selectedDate =
       e.target.value;
 
-    const planStart =
-      new Date(
-        selectedTask.planStartDate
-      );
+    const planStart = new Date(row.planStartDate);
 
     const actualStart =
       new Date(
@@ -388,15 +449,13 @@ export default function MyActionsPage() {
       return;
     }
 
-    setSelectedTask({
-      ...selectedTask,
-      actualStartDate:
-        selectedDate,
-    });
+    updateField(
+    index,
+    "actualStartDate",
+    selectedDate
+);   
   }}
-  readOnly={
-    !!selectedTask.actualStartDate
-  }
+ readOnly={!!row.actualStartDate}
   className="w-full border rounded-lg p-2"
 />
 </div>

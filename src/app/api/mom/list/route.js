@@ -64,17 +64,17 @@ if (view === "my") {
     });
   }
 
-  // BA & Head BA are one Team
+  // BA & Head-BA are one Team
 
   let supportRoles = [];
 
   if (
     loggedUser.supportRole === "BA" ||
-    loggedUser.supportRole === "Head BA"
+    loggedUser.supportRole === "Head-BA"
   ) {
     supportRoles = [
       "BA",
-      "Head BA",
+      "Head-BA",
     ];
   } else {
     supportRoles = [

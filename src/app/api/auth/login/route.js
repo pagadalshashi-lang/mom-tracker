@@ -25,7 +25,9 @@ export async function POST(req) {
         }
       );
     }
-
+console.log("Email:", email);
+console.log("Password Entered:", password);
+console.log("Password from DB:", user.password);
     const isMatch = await bcrypt.compare(
       password,
       user.password
@@ -43,7 +45,7 @@ export async function POST(req) {
       );
     }
 
-   
+   console.log("Is Match:", isMatch);
     return NextResponse.json({
   success: true,
   message: "Login Successful",

@@ -3,7 +3,6 @@ import { NextResponse } from "next/server";
 import connectDB from "@/lib/mongodb";
 import MomAction from "@/models/MomAction";
 import User from "@/models/User";
-
 export async function GET(req) {
   try {
     await connectDB();
@@ -12,6 +11,14 @@ export async function GET(req) {
 
     const email = searchParams.get("email");
     const view = searchParams.get("view") || "my";
+
+    const status = searchParams.get("status") || "All";
+    const uploadedBy = searchParams.get("uploadedBy") || "All";
+    const planStartDate = searchParams.get("planStartDate");
+    const planEndDate = searchParams.get("planEndDate");
+
+    const page = Number(searchParams.get("page")) || 1;
+    const limit = Number(searchParams.get("limit")) || 20;
 
     if (!email) {
       return NextResponse.json(
@@ -25,99 +32,148 @@ export async function GET(req) {
       );
     }
 
-   let actions = [];
+    let filter = {};
 
-if (view === "my") {
+    // ===========================
+    // MY TASKS
+    // ===========================
 
-  // Tasks assigned to me
+    if (view === "my") {
 
-  actions = await MomAction.find({
-    $or: [
-      { fprEmail: email },
-      { sprEmail: email },
-      { fprPersonalEmail: email },
-      { sprPersonalEmail: email },
-    ],
-  }).sort({
-    createdAt: -1,
-  });
+      filter = {
+        $or: [
+          { fprEmail: email },
+          { sprEmail: email },
+          { fprPersonalEmail: email },
+          { sprPersonalEmail: email },
+        ],
+      };
 
-} else if (view === "uploaded") {
+    }
 
-  // Tasks uploaded by me
+    // ===========================
+    // UPLOADED BY ME
+    // ===========================
 
-  actions = await MomAction.find({
-    uploadedByEmail: email,
-  }).sort({
-    createdAt: -1,
-  });
+    else if (view === "uploaded") {
 
-} else {
+      filter = {
+        uploadedByEmail: email,
+      };
 
- // Logged In User
+    }
 
-const loggedUser = await User.findOne({
-  email,
-});
+    // ===========================
+    // MY TEAM
+    // ===========================
 
-if (!loggedUser) {
-  return NextResponse.json({
-    success: false,
-    message: "User not found",
-  });
-}
+    else {
 
-// BA & Head BA are one Team
+      const loggedUser = await User.findOne({
+        email,
+      });
 
-let supportRoles = [];
+      if (!loggedUser) {
 
-if (
-  loggedUser.supportRole === "BA" ||
-  loggedUser.supportRole === "Head BA"
-) {
-  supportRoles = [
-    "BA",
-    "Head BA",
-  ];
-} else {
-  supportRoles = [
-    loggedUser.supportRole,
-  ];
-}
+        return NextResponse.json({
+          success: false,
+          message: "User not found",
+        });
 
-// Same Team Users
+      }
 
-const teamUsers = await User.find({
-  supportRole: {
-    $in: supportRoles,
-  },
-});
+      let supportRoles = [];
 
-const teamEmails = [];
+      if (
+        loggedUser.supportRole === "BA" ||
+        loggedUser.supportRole === "Head-BA"
+      ) {
 
-teamUsers.forEach((u) => {
-  if (u.email) {
-    teamEmails.push(u.email);
-  }
-});
+        supportRoles = [
+          "BA",
+          "Head-BA",
+        ];
 
-actions = await MomAction.find({
-  $or: [
-    { fprEmail: { $in: teamEmails } },
-    { sprEmail: { $in: teamEmails } },
-    { fprPersonalEmail: { $in: teamEmails } },
-    { sprPersonalEmail: { $in: teamEmails } },
-    { uploadedByEmail: { $in: teamEmails } },
-  ],
-}).sort({
-  createdAt: -1,
-});
+      } else {
 
-}
+        supportRoles = [
+          loggedUser.supportRole,
+        ];
+
+      }
+
+      const teamUsers = await User.find({
+        supportRole: {
+          $in: supportRoles,
+        },
+      });
+
+      const teamEmails = teamUsers.map(
+        (u) => u.email
+      );
+
+      filter = {
+
+        $or: [
+
+          { fprEmail: { $in: teamEmails } },
+
+          { sprEmail: { $in: teamEmails } },
+
+          { fprPersonalEmail: { $in: teamEmails } },
+
+          { sprPersonalEmail: { $in: teamEmails } },
+
+          { uploadedByEmail: { $in: teamEmails } },
+
+        ],
+
+      };
+
+    }
+
+    // ===========================
+    // FILTERS
+    // ===========================
+
+    if (status !== "All") {
+      filter.status = status;
+    }
+
+    if (uploadedBy !== "All") {
+      filter.uploadedBy = uploadedBy;
+    }
+
+    if (planStartDate) {
+      filter.planStartDate = planStartDate;
+    }
+
+    if (planEndDate) {
+      filter.planEndDate = planEndDate;
+    }
+
+    const total = await MomAction.countDocuments(filter);
+
+    const actions = await MomAction.find(filter)
+      .sort({
+        createdAt: -1,
+      })
+      .skip((page - 1) * limit)
+      .limit(limit);
+
+    const uploadedByList =
+      await MomAction.distinct("uploadedBy");
+
+
+
     return NextResponse.json({
-      success: true,
-      data: actions,
-    });
+  success: true,
+  data: actions,
+  uploadedByList,
+  total,
+  page,
+  totalPages: Math.ceil(total / limit),
+});
   } catch (error) {
     console.error(
       "MY ACTION ERROR:",
