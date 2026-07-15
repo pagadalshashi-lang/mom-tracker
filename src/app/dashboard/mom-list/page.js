@@ -320,7 +320,7 @@ row.status==="Closed"
 
 </td>
 
-<td className="border p-2 whitespace-pre-wrap">
+<td className="border p-2 text-black whitespace-pre-wrap">
 {row.remark}
 </td>
 

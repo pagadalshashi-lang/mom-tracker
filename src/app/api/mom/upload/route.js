@@ -6,18 +6,23 @@ import * as XLSX from "xlsx";
 // ======================================
 
 function excelDateToJSDate(value) {
-  if (!value || value === "-") {
-    return "";
-  }
+ if (
+  value === "" ||
+  value === null ||
+  value === undefined ||
+  value === "-"
+) {
+  return "";
+}
 
   if (typeof value === "number") {
     const date = XLSX.SSF.parse_date_code(value);
 
     if (!date) return "";
 
-    return `${String(date.d).padStart(2, "0")}/${String(
-      date.m
-    ).padStart(2, "0")}/${date.y}`;
+   return `${date.y}-${String(date.m).padStart(2, "0")}-${String(
+  date.d
+).padStart(2, "0")}`;
   }
 
   return value;
@@ -65,13 +70,71 @@ export async function POST(req) {
     const worksheet =
       workbook.Sheets[sheetName];
 
-    const rawData =
-      XLSX.utils.sheet_to_json(
-        worksheet,
-        {
-          defval: "",
-        }
-      );
+   const rawData = XLSX.utils
+  .sheet_to_json(worksheet, {
+    defval: "",
+  })
+  .map((row) => ({
+    ...row,
+
+    "Plan Start Date":
+      row["Plan Start Date"] || row["P.Start Date"],
+
+    "Actual Start Date":
+      row["Actual Start Date"] || row["A.Start Date"],
+
+    "Plan End Date":
+      row["Plan End Date"] || row["P.End Date"],
+
+    "Actual End Date":
+      row["Actual End Date"] || row["A.End Date"],
+
+    Status:
+      row["Status"] || row["Status "],
+  }));
+
+      if (rawData.length === 0) {
+  return NextResponse.json(
+    {
+      success: false,
+      message: "Excel file is empty.",
+    },
+    { status: 400 }
+  );
+}
+// ======================================
+// REQUIRED COLUMNS VALIDATION
+// ======================================
+
+const requiredColumns = [
+  "Account",
+  "Main Point",
+  "Sub Point",
+  "FPR",
+  "SPR",
+  "Plan Start Date",
+  "Plan End Date",
+  "Status",
+];
+
+const headers = Object.keys(rawData[0] || {});
+
+
+
+const missingColumns = requiredColumns.filter(
+  (col) => !headers.includes(col)
+);
+
+if (missingColumns.length > 0) {
+  return NextResponse.json(
+    {
+      success: false,
+      message: `Missing columns: ${missingColumns.join(", ")}`,
+    },
+    { status: 400 }
+  );
+}
+
 
     // ======================================
     // FORMAT DATA

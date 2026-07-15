@@ -67,36 +67,36 @@ export default function LoginPage() {
       );
     }
   };
+const handleSubmit = (e) => {
+  e.preventDefault(); // Prevent page refresh
+  handleLogin();      // Call your login function
+};
 
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
+return (
+  <div className="min-h-screen flex items-center justify-center bg-gray-100">
+    <div className="bg-white p-10 rounded-3xl shadow-2xl w-full max-w-md">
+      <div className="text-center mb-8">
+        <img
+          src="/logo.jpg"
+          alt="i4T"
+          className="w-20 mx-auto mb-4"
+        />
 
-      <div className="bg-white p-10 rounded-3xl shadow-2xl w-full max-w-md">
+        <h1 className="text-5xl font-bold text-[#3E7591]">
+          MoM
+        </h1>
 
-        <div className="text-center mb-8">
+        <h2 className="text-5xl font-bold text-[#3E7591]">
+          Tracker
+        </h2>
 
-          <img
-            src="/logo.jpg"
-            alt="i4T"
-            className="w-20 mx-auto mb-4"
-          />
+        <p className="text-gray-600 mt-2">
+          Login
+        </p>
+      </div>
 
-          <h1 className="text-5xl font-bold text-[#3E7591]">
-            MoM
-          </h1>
-
-          <h2 className="text-5xl font-bold text-[#3E7591]">
-            Tracker
-          </h2>
-
-          <p className="text-gray-600 mt-2">
-            Login
-          </p>
-
-        </div>
-
+      <form onSubmit={handleSubmit}>
         <div className="mb-4">
-
           <label className="block mb-2 font-semibold text-[#3E7591]">
             Email
           </label>
@@ -104,18 +104,12 @@ export default function LoginPage() {
           <input
             type="email"
             value={email}
-            onChange={(e) =>
-              setEmail(
-                e.target.value
-              )
-            }
+            onChange={(e) => setEmail(e.target.value)}
             className="w-full border p-3 rounded-lg text-black"
           />
-
         </div>
 
         <div className="mb-6">
-
           <label className="block mb-2 font-semibold text-[#3E7591]">
             Password
           </label>
@@ -123,25 +117,20 @@ export default function LoginPage() {
           <input
             type="password"
             value={password}
-            onChange={(e) =>
-              setPassword(
-                e.target.value
-              )
-            }
+            onChange={(e) => setPassword(e.target.value)}
             className="w-full border p-3 rounded-lg text-black"
           />
-
         </div>
 
         <button
-          onClick={handleLogin}
+          type="submit"
           className="w-full bg-[#3E7591] hover:bg-[#2f617a] text-white p-3 rounded-lg font-semibold"
         >
           Login
         </button>
-
-      </div>
-
+      </form>
     </div>
-  );
+  </div>
+);
+  
 }
