@@ -8,22 +8,25 @@ export async function POST(req) {
   try {
     await connectDB();
 
-   const {
-  id,
+    const {
+      id,
 
-  status,
-  remark,
+      account,
 
-  actualStartDate,
+      status,
+      remark,
 
-  planEndDate,
-  actualEndDate,
+      planStartDate,
+      actualStartDate,
 
-  updatedBy,
-  updatedByEmail,
-} = await req.json();
-    const oldData =
-      await MomAction.findById(id);
+      planEndDate,
+      actualEndDate,
+
+      updatedBy,
+      updatedByEmail,
+    } = await req.json();
+
+    const oldData = await MomAction.findById(id);
 
     if (!oldData) {
       return NextResponse.json(
@@ -39,14 +42,11 @@ export async function POST(req) {
 
     // Closed task cannot be edited
 
-    if (
-      oldData.status === "Closed"
-    ) {
+    if (oldData.status === "Closed") {
       return NextResponse.json(
         {
           success: false,
-          message:
-            "Closed task cannot be edited",
+          message: "Closed task cannot be edited",
         },
         {
           status: 400,
@@ -56,55 +56,48 @@ export async function POST(req) {
 
     // Auto set Actual End Date if Closed
 
-    let finalActualEndDate =
-      actualEndDate;
-let finalActualStartDate =
-  oldData.actualStartDate;
+    let finalActualEndDate = actualEndDate;
+    let finalActualStartDate = oldData.actualStartDate;
 
-if (
-  actualStartDate &&
-  !oldData.actualStartDate
-) {
-  finalActualStartDate =
-    actualStartDate;
-}
-      
-    if (
-      status === "Closed" &&
-      !actualEndDate
-    ) {
-      finalActualEndDate =
-        new Date();
+    if (actualStartDate && !oldData.actualStartDate) {
+      finalActualStartDate = actualStartDate;
     }
+
+    if (status === "Closed" && !actualEndDate) {
+      finalActualEndDate = new Date();
+    }
+
+    // Fall back to existing values if the account / plan start date
+    // weren't sent (keeps this endpoint backward compatible)
+    const finalAccount = account || oldData.account;
+    const finalPlanStartDate = planStartDate || oldData.planStartDate;
 
     // Update MOM Action
 
-    const updatedAction =
-      await MomAction.findByIdAndUpdate(
-        id,
+    const updatedAction = await MomAction.findByIdAndUpdate(
+      id,
       {
-  status,
-  remark,
+        account: finalAccount,
 
-  actualStartDate:
-    finalActualStartDate,
+        status,
+        remark,
 
-  planEndDate,
+        planStartDate: finalPlanStartDate,
+        actualStartDate: finalActualStartDate,
 
-  actualEndDate:
-    finalActualEndDate,
+        planEndDate,
 
-  updatedBy,
-  updatedByEmail,
+        actualEndDate: finalActualEndDate,
 
-  updatedAt:
-    new Date(),
-}
-  ,
-        {
-          new: true,
-        }
-      );
+        updatedBy,
+        updatedByEmail,
+
+        updatedAt: new Date(),
+      },
+      {
+        new: true,
+      }
+    );
 
     // Save History
 
@@ -114,49 +107,43 @@ if (
       updatedBy,
       updatedByEmail,
 
-      oldStatus:
-        oldData.status,
+      oldAccount: oldData.account,
+      newAccount: finalAccount,
 
-      newStatus:
-        status,
+      oldStatus: oldData.status,
 
-      oldRemark:
-        oldData.remark,
+      newStatus: status,
 
-      newRemark:
-        remark,
+      oldRemark: oldData.remark,
 
-      oldPlanEndDate:
-        oldData.planEndDate,
+      newRemark: remark,
 
-      newPlanEndDate:
-        planEndDate,
+      oldPlanStartDate: oldData.planStartDate,
 
-      oldActualEndDate:
-        oldData.actualEndDate,
+      newPlanStartDate: finalPlanStartDate,
 
-      newActualEndDate:
-        finalActualEndDate,
+      oldPlanEndDate: oldData.planEndDate,
+
+      newPlanEndDate: planEndDate,
+
+      oldActualEndDate: oldData.actualEndDate,
+
+      newActualEndDate: finalActualEndDate,
     });
 
     return NextResponse.json({
       success: true,
-      message:
-        "Task Updated Successfully",
+      message: "Task Updated Successfully",
 
       data: updatedAction,
     });
   } catch (error) {
-    console.error(
-      "UPDATE STATUS ERROR:",
-      error
-    );
+    console.error("UPDATE STATUS ERROR:", error);
 
     return NextResponse.json(
       {
         success: false,
-        message:
-          error.message,
+        message: error.message,
       },
       {
         status: 500,

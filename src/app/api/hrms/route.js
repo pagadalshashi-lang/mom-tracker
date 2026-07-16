@@ -9,7 +9,7 @@ export async function GET() {
             "h86ydGjdMZmmwxdcggli8mad2ponydcikazPzBz4Ido=",
           "Content-Type": "application/json",
           EmployeeFields:
-            "CODE,FNAME,EMAIL,PERSONALEMAIL,SURO",
+            "CODE,FNAME,EMAIL,PERSONALEMAIL,SURO,COP",
         },
       }
     );
@@ -22,6 +22,7 @@ export async function GET() {
       email: emp.Email,
       personalEmail: emp.PersonalEmail,
       supportRole: emp.SURO,
+      Accounts: emp.COP,
     }));
 
     return Response.json(employees);

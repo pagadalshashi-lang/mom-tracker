@@ -44,9 +44,6 @@ export default function LoginPage() {
           data.user
         );
 
-        alert(
-          "Login Successful"
-        );
 
         window.location.href =
           "/dashboard";

@@ -99,10 +99,32 @@ export default function MyActionsPage() {
   };
 
   const updateAction = async (row) => {
-    if (status !== "Open" && !row.actualStartDate?.trim()) {
+    // Mandatory fields before save
+    if (!row.account) {
+      alert("Account is mandatory");
+      return;
+    }
+
+    if (!row.planStartDate) {
+      alert("Plan Start Date is mandatory");
+      return;
+    }
+
+    if (!row.planEndDate) {
+      alert("Plan End Date is mandatory");
+      return;
+    }
+
+    if (!row.status) {
+      alert("Status is mandatory");
+      return;
+    }
+
+    if (row.status !== "Open" && !row.actualStartDate?.trim()) {
       alert("Please Set Actual Start Date First");
       return;
     }
+
     if (row.status === "Closed" && !row.actualEndDate) {
       row.actualEndDate = new Date().toISOString().split("T")[0];
     }
@@ -141,9 +163,12 @@ export default function MyActionsPage() {
         body: JSON.stringify({
           id: row._id,
 
+          account: row.account,
+
           status: row.status,
           remark: row.remark,
 
+          planStartDate: row.planStartDate,
           actualStartDate: row.actualStartDate,
 
           planEndDate: row.planEndDate,
@@ -331,6 +356,7 @@ export default function MyActionsPage() {
           <table className="w-full text-sm">
             <thead className="bg-[#3E7591] text-white">
               <tr>
+                <th className="p-4 text-left w-[120px]">Account</th>
                 <th className="p-4 text-left w-[120px]">Main Point</th>
                 <th className="p-4 text-left">Sub Point</th>
                 <th className="p-4 text-left w-[180px]">
@@ -350,6 +376,8 @@ export default function MyActionsPage() {
                   key={row._id}
                   className="border-b hover:bg-blue-50 text-black"
                 >
+                  <td className="p-4">{row.account || "-"}</td>
+
                   <td className="p-4 font-medium">{row.mainPoint}</td>
 
                   <td className="p-4 max-w-[400px] break-words">
@@ -442,6 +470,38 @@ export default function MyActionsPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               <div>
+                <label className="font-semibold">
+                  Account <span className="text-red-500">*</span>
+                </label>
+
+                <select
+                  value={selectedTask.account || ""}
+                  onChange={(e) =>
+                    setSelectedTask({
+                      ...selectedTask,
+                      account: e.target.value,
+                    })
+                  }
+                  className="w-full border rounded-lg p-2"
+                >
+                  <option value="">Select Account</option>
+                  {filterOptions.accounts.map((acc) => (
+                    <option key={acc} value={acc}>
+                      {acc}
+                    </option>
+                  ))}
+                  {/* keep the current value selectable even if it isn't
+                      in the known-accounts list yet */}
+                  {selectedTask.account &&
+                    !filterOptions.accounts.includes(selectedTask.account) && (
+                      <option value={selectedTask.account}>
+                        {selectedTask.account}
+                      </option>
+                    )}
+                </select>
+              </div>
+
+              <div>
                 <label className="font-semibold">Main Point</label>
 
                 <input
@@ -490,8 +550,23 @@ export default function MyActionsPage() {
                   className="w-full border rounded-lg p-2 bg-gray-100"
                 />
               </div>
+
               <div>
-                <label className="font-semibold">Actual Start Date</label>
+                <label className="font-semibold">
+                  Plan Start Date <span className="text-red-500">*</span>
+                </label>
+
+                <input
+                  value={selectedTask.planStartDate || ""}
+                  readOnly
+                  className="w-full border rounded-lg p-2 bg-gray-100"
+                />
+              </div>
+
+              <div>
+                <label className="font-semibold">
+                  Actual Start Date <span className="text-red-500">*</span>
+                </label>
 
                 <input
                   type="date"
@@ -521,7 +596,9 @@ export default function MyActionsPage() {
               </div>
 
               <div>
-                <label className="font-semibold">Plan End Date</label>
+                <label className="font-semibold">
+                  Plan End Date <span className="text-red-500">*</span>
+                </label>
                 <input
                   value={selectedTask.planEndDate || ""}
                   readOnly
@@ -541,7 +618,9 @@ export default function MyActionsPage() {
               </div>
 
               <div>
-                <label className="font-semibold">Status</label>
+                <label className="font-semibold">
+                  Status <span className="text-red-500">*</span>
+                </label>
 
                 <select
                   value={selectedTask.status}
