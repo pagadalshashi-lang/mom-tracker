@@ -328,7 +328,7 @@ export default function MyActionsPage() {
           <input
             type="text"
             list="my-actions-account-options"
-            placeholder="Search / select Account"
+            placeholder="Search"
             value={accountFilter}
             onChange={(e) => setAccountFilter(e.target.value)}
             className="border p-2.5 rounded-lg text-black"
@@ -510,10 +510,9 @@ export default function MyActionsPage() {
                   Account <span className="text-red-500">*</span>
                 </label>
 
-                <input
+ <input
   type="text"
-  list="modal-account-options"
-  placeholder="Search / select Account"
+  placeholder="Search Account"
   value={selectedTask.account || ""}
   onChange={(e) =>
     setSelectedTask({

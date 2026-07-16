@@ -262,6 +262,20 @@ export default function UploadMomPage() {
           Upload MoM Excel
         </h1>
 
+        <button
+  onClick={() => {
+    const link = document.createElement("a");
+    link.href = "/Sample MOM.xlsx";
+    link.download = "Sample MOM.xlsx";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }}
+  className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700"
+>
+  Download Sample Excel
+</button>
+
         <div className="flex flex-col sm:flex-row gap-3 mb-6">
           <input
             type="file"
