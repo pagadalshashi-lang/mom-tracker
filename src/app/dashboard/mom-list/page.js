@@ -76,6 +76,7 @@ export default function MomListPage() {
 
   const downloadExcel = () => {
     const exportData = filteredData.map((row) => ({
+      "Account": row.account,
       "Main Point": row.mainPoint,
       "Sub Point": row.subPoint,
       FPR: row.fpr,
@@ -239,6 +240,7 @@ export default function MomListPage() {
           <table className="min-w-full border-collapse">
             <thead className="bg-[#3E7591] text-white sticky top-0">
               <tr>
+                 <th className="p-3 border">Account</th>
                 <th className="p-3 border">Main Point</th>
                 <th className="p-3 border">Sub Point</th>
                 <th className="p-3 border">FPR</th>
@@ -262,6 +264,7 @@ export default function MomListPage() {
                       index % 2 === 0 ? "bg-white" : "bg-gray-50"
                     }`}
                   >
+                    <td className="border p-2 text-black">{row.account}</td>
                     <td className="border p-2 text-black">
                       {row.mainPoint}
                     </td>
