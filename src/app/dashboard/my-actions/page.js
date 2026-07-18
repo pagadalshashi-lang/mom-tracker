@@ -469,7 +469,7 @@ export default function MyActionsPage() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-              <div>
+              {/* <div>
                 <label className="font-semibold">
                   Account <span className="text-red-500">*</span>
                 </label>
@@ -490,8 +490,6 @@ export default function MyActionsPage() {
                       {acc}
                     </option>
                   ))}
-                  {/* keep the current value selectable even if it isn't
-                      in the known-accounts list yet */}
                   {selectedTask.account &&
                     !filterOptions.accounts.includes(selectedTask.account) && (
                       <option value={selectedTask.account}>
@@ -499,8 +497,23 @@ export default function MyActionsPage() {
                       </option>
                     )}
                 </select>
-              </div>
+              </div> */}
+<div>
+  <label className="font-semibold">
+    Account <span className="text-red-500">*</span>
+  </label>
 
+  <input
+    value={selectedTask.account || ""}
+    onChange={(e) =>
+                    setSelectedTask({
+                      ...selectedTask,
+                      account: e.target.value,
+                    })
+                  }
+    className="w-full border rounded-lg p-2 bg-gray-100"
+  />
+</div>
               <div>
                 <label className="font-semibold">Main Point</label>
 

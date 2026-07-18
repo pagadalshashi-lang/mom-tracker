@@ -95,6 +95,7 @@ export async function POST(req) {
         // read account/mainPoint/subPoint/etc directly off this object.
         validRows.push({
           ...row,
+          account: row.account,
           index,
           rowNumber: index + 2,
         });

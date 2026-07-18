@@ -1,27 +1,34 @@
 import mongoose from "mongoose";
 
-const MomHistorySchema =
-  new mongoose.Schema(
-    {
-      momId: String,
+const MomHistorySchema = new mongoose.Schema(
+  {
+    momId: String,
 
-      updatedBy: String,
-      updatedByEmail: String,
+    updatedBy: String,
+    updatedByEmail: String,
 
-      oldStatus: String,
-      newStatus: String,
+    oldAccount: String,
+    newAccount: String,
 
-      oldRemark: String,
-      newRemark: String,
-    },
-    {
-      timestamps: true,
-    }
-  );
+    oldStatus: String,
+    newStatus: String,
 
-export default
-  mongoose.models.MomHistory ||
-  mongoose.model(
-    "MomHistory",
-    MomHistorySchema
-  );
+    oldRemark: String,
+    newRemark: String,
+
+    oldPlanStartDate: String,
+    newPlanStartDate: String,
+
+    oldPlanEndDate: String,
+    newPlanEndDate: String,
+
+    oldActualEndDate: Date,
+    newActualEndDate: Date,
+  },
+  {
+    timestamps: true,
+  }
+);
+
+export default mongoose.models.MomHistory ||
+  mongoose.model("MomHistory", MomHistorySchema);

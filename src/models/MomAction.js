@@ -2,6 +2,8 @@ import mongoose from "mongoose";
 
 const MomActionSchema = new mongoose.Schema(
   {
+    account: String,
+
     mainPoint: String,
     subPoint: String,
 
@@ -23,12 +25,7 @@ const MomActionSchema = new mongoose.Schema(
 
     status: {
       type: String,
-      enum: [
-        "Open",
-        "In Process",
-        "Pending",
-        "Closed",
-      ],
+      enum: ["Open", "In Process", "Pending", "Closed"],
       default: "Open",
     },
 
@@ -48,7 +45,4 @@ const MomActionSchema = new mongoose.Schema(
 );
 
 export default mongoose.models.MomAction ||
-  mongoose.model(
-    "MomAction",
-    MomActionSchema
-  );
+  mongoose.model("MomAction", MomActionSchema);

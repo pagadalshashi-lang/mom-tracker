@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Select from "react-select";
 
 export default function MyActionsPage() {
   const [actions, setActions] = useState([]);
@@ -27,6 +28,16 @@ export default function MyActionsPage() {
   // in existing MOM records.
   const [hrmsAccounts, setHrmsAccounts] = useState([]);
 
+  // NEW: tells us we're on the client, so it's safe to reference `document`
+  // for react-select's menuPortalTarget. Without this guard, referencing
+  // document.body during the server render pass of this client component
+  // throws / causes hydration mismatches in Next.js.
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   useEffect(() => {
     fetch("/api/hrms")
       .then((res) => res.json())
@@ -45,7 +56,7 @@ export default function MyActionsPage() {
         const unique = [...new Set(all)].sort((a, b) =>
           a.localeCompare(b)
         );
-
+        console.log("HRMS Accounts", unique);
         setHrmsAccounts(unique);
       })
       .catch((err) => console.error("HRMS accounts fetch failed:", err));
@@ -503,31 +514,71 @@ export default function MyActionsPage() {
                 ×
               </button>
             </div>
-
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               <div>
                 <label className="font-semibold">
                   Account <span className="text-red-500">*</span>
                 </label>
-
- <input
-  type="text"
-  placeholder="Search Account"
-  value={selectedTask.account || ""}
-  onChange={(e) =>
-    setSelectedTask({
-      ...selectedTask,
-      account: e.target.value,
-    })
-  }
-  className="w-full border rounded-lg p-2"
-/>
-<datalist id="modal-account-options">
-  {accountOptions.map((acc) => (
-    <option key={acc} value={acc} />
-  ))}
-</datalist>
-                 
+                <Select
+                  instanceId="account-select"
+                  className="react-select-container"
+                  classNamePrefix="react-select"
+                  options={accountOptions.map((acc) => ({
+                    value: acc,
+                    label: acc,
+                  }))}
+                  value={
+                    selectedTask.account
+                      ? {
+                          value: selectedTask.account,
+                          label: selectedTask.account,
+                        }
+                      : null
+                  }
+                  onChange={(selected) =>
+                    setSelectedTask({
+                      ...selectedTask,
+                      account: selected?.value || "",
+                    })
+                  }
+                  placeholder="Search Account..."
+                  isSearchable={true}
+                  isClearable={false}
+                  menuPlacement="auto"
+                  // --- THE FIX ---
+                  // Render the dropdown menu in a portal attached to
+                  // document.body instead of inline inside the modal.
+                  // The modal's content div has `overflowY: "auto"`,
+                  // which clips any absolutely-positioned descendant
+                  // (like react-select's menu) that would render outside
+                  // its bounds — regardless of z-index. A portal moves the
+                  // menu's actual DOM node outside that clipping ancestor.
+                  //
+                  // `mounted` guards against referencing `document` during
+                  // Next.js's server render pass of this client component.
+                  menuPortalTarget={mounted ? document.body : null}
+                  // Position relative to the viewport (not a scrolling
+                  // ancestor), so the menu stays correctly anchored to the
+                  // control even while the modal itself is scrolled.
+                  menuPosition="fixed"
+                  styles={{
+                    // z-index for the portal wrapper itself — this is the
+                    // element that actually needs to sit above the modal's
+                    // zIndex: 999999 overlay.
+                    menuPortal: (base) => ({
+                      ...base,
+                      zIndex: 1000000,
+                    }),
+                    menu: (base) => ({
+                      ...base,
+                      zIndex: 1000000,
+                    }),
+                    control: (base) => ({
+                      ...base,
+                      minHeight: 42,
+                    }),
+                  }}
+                />
               </div>
 
               <div>
@@ -691,7 +742,7 @@ export default function MyActionsPage() {
               </div>
 
               <div className="col-span-2">
-                <label className="font-semibold">Remark</label>
+                <label className="font-semibold">Remafsdfdsrk</label>
 
                 <textarea
                   rows={4}
